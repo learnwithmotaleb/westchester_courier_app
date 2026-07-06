@@ -7,4 +7,14 @@ class RoutePath {
   static const String verificationSuccess = '/VerificationSuccessScreen';
   static const String welcome = '/WelcomeScreen';
   static const String bottomNav = '/BottomNavScreen';
+  static const String accountSetting = '/AccountSettingScreen';
+  static const String changePassword = '/ChangePasswordScreen';
+  static const String jobHistory = '/JobHistoryScreen';
+  static const String contactSupport = '/ContactSupportScreen';
+  static const String updateProfile = '/UpdateProfileScreen';
+  static const String termsCondition = '/TermsConditionScreen';
+  static const String privacyPolicy = '/PrivacyPolicyScreen';
+  static const String jobDetails = '/JobDetailsScreen';
+  static const String deliveryProof = '/DeliveryProofScreen';
+  static const String reportIssue = '/ReportIssusScreen';
 }

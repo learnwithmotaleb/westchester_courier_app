@@ -37,10 +37,7 @@ class AppAlerts {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _CircleIcon(
-              icon: Icons.close_rounded,
-              color: AppColors.redColor,
-            ),
+            _CircleIcon(icon: Icons.close_rounded, color: AppColors.redColor),
             SizedBox(height: Dimensions.h(16)),
             Text(
               message,
@@ -84,7 +81,9 @@ class AppAlerts {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyText.copyWith(color: AppColors.darkGreyColor),
+              style: AppTextStyles.bodyText.copyWith(
+                color: AppColors.darkGreyColor,
+              ),
             ),
             SizedBox(height: Dimensions.h(24)),
             Row(
@@ -140,7 +139,9 @@ class AppAlerts {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: AppTextStyles.bodyText.copyWith(color: AppColors.darkGreyColor),
+              style: AppTextStyles.bodyText.copyWith(
+                color: AppColors.darkGreyColor,
+              ),
             ),
             SizedBox(height: Dimensions.h(24)),
             Row(
@@ -196,8 +197,11 @@ class AppAlerts {
                   border: Border.all(color: AppColors.redColor, width: 1.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(Icons.priority_high,
-                    color: AppColors.redColor, size: 16),
+                child: Icon(
+                  Icons.priority_high,
+                  color: AppColors.redColor,
+                  size: 16,
+                ),
               ),
             ),
             SizedBox(height: Dimensions.h(16)),
@@ -230,13 +234,15 @@ class AppAlerts {
                         color: AppColors.whiteColor,
                         borderRadius: BorderRadius.circular(Dimensions.r(8)),
                         border: Border.all(
-                            color: AppColors.greyColor.withOpacity(0.3)),
+                          color: AppColors.greyColor.withOpacity(0.3),
+                        ),
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         cancelLabel,
-                        style: AppTextStyles.labelLarge
-                            .copyWith(color: AppColors.greyColor),
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.greyColor,
+                        ),
                       ),
                     ),
                   ),
@@ -257,10 +263,75 @@ class AppAlerts {
                       alignment: Alignment.center,
                       child: Text(
                         confirmLabel,
-                        style: AppTextStyles.labelLarge
-                            .copyWith(color: AppColors.primaryColor),
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.primaryColor,
+                        ),
                       ),
                     ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static void actionConfirm({
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+    required String confirmLabel,
+    String cancelLabel = 'Cancel',
+  }) {
+    Get.dialog(
+      _AlertWrapper(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.new_releases_outlined,
+              color: AppColors.redColor,
+              size: Dimensions.rs(56),
+            ),
+            SizedBox(height: Dimensions.h(16)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.h4.copyWith(
+                color: AppColors.blackColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: Dimensions.h(8)),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.darkGreyColor,
+              ),
+            ),
+            SizedBox(height: Dimensions.h(24)),
+            Row(
+              children: [
+                Expanded(
+                  child: _AlertButton(
+                    label: cancelLabel,
+                    isOutlined: true,
+                    onTap: () => Get.back(),
+                  ),
+                ),
+                SizedBox(width: Dimensions.w(12)),
+                Expanded(
+                  child: _AlertButton(
+                    label: confirmLabel,
+                    color: AppColors.redColor.withOpacity(0.1),
+                    textColor: AppColors.redColor,
+                    onTap: () {
+                      Get.back();
+                      onConfirm();
+                    },
                   ),
                 ),
               ],
@@ -319,12 +390,14 @@ class _AlertButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool isOutlined;
   final Color? color;
+  final Color? textColor;
 
   const _AlertButton({
     required this.label,
     required this.onTap,
     this.isOutlined = false,
     this.color,
+    this.textColor,
   });
 
   @override
@@ -346,7 +419,9 @@ class _AlertButton extends StatelessWidget {
         child: Text(
           label,
           style: AppTextStyles.labelLarge.copyWith(
-            color: isOutlined ? AppColors.darkGreyColor : AppColors.whiteColor,
+            color:
+                textColor ??
+                (isOutlined ? AppColors.darkGreyColor : AppColors.whiteColor),
           ),
         ),
       ),

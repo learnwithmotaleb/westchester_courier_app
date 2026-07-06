@@ -19,8 +19,9 @@ class BottomNavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        isActive ? AppColors.primaryColor : AppColors.iconInactiveColor;
+    final color = isActive
+        ? AppColors.primaryColor
+        : AppColors.iconInactiveColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -42,11 +43,7 @@ class BottomNavItem extends StatelessWidget {
               ),
             ),
             SizedBox(height: Dimensions.h(6)),
-            Icon(
-              icon,
-              size: Dimensions.rs(22),
-              color: color,
-            ),
+            Icon(icon, size: Dimensions.rs(22), color: color),
             SizedBox(height: Dimensions.h(4)),
             Text(
               label,

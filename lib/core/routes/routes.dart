@@ -24,6 +24,37 @@ import '../../presentation/auth/wellcome/controller/welcome_controller.dart';
 import '../../presentation/bottom_nav/screen/bottom_nav_screen.dart';
 import '../../presentation/bottom_nav/controller/bottom_nav_controller.dart';
 
+import '../../presentation/account_setting/screen/account_setting_screen.dart';
+import '../../presentation/account_setting/controller/account_setting_controller.dart';
+
+import '../../presentation/change_password/screen/change_password_screen.dart';
+import '../../presentation/change_password/controller/change_password_controller.dart';
+
+import '../../presentation/job_history/job_history_screen.dart';
+import '../../presentation/job_history/controller/job_history_controller.dart';
+
+import '../../presentation/contact_support/screen/contact_support_screen.dart';
+import '../../presentation/contact_support/controller/contact_support_controller.dart';
+
+import '../../presentation/update_profile/screen/update_profile_screen.dart';
+import '../../presentation/update_profile/controller/update_profile_controller.dart';
+
+import '../../presentation/terms_condition/screen/terms_condition_screen.dart';
+import '../../presentation/terms_condition/controller/terms_condition_controller.dart';
+
+import '../../presentation/privacy_policy/screen/privacy_policy_screen.dart';
+import '../../presentation/privacy_policy/controller/privacy_policy_controller.dart';
+
+import '../../presentation/job_details/screen/job_details_screen.dart';
+import '../../presentation/job_details/controller/job_details_controller.dart';
+
+import '../../presentation/delivery_proof/screen/delivery_proof_screen.dart';
+import '../../presentation/delivery_proof/controller/delivery_proof_controller.dart';
+
+import '../../presentation/report_issus/screen/report_issus_screen.dart';
+import '../../presentation/report_issus/controller/report_issus_controller.dart';
+
+
 class AppRouter {
   static final List<GetPage<dynamic>> pages = [
     GetPage(
@@ -85,6 +116,86 @@ class AppRouter {
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
         Get.lazyPut(() => BottomNavController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.accountSetting,
+      page: () => const AccountSettingScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => AccountSettingController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.changePassword,
+      page: () => const ChangePasswordScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ChangePasswordController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.jobHistory,
+      page: () => const JobHistoryScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => JobHistoryController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.contactSupport,
+      page: () => const ContactSupportScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ContactSupportController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.updateProfile,
+      page: () => const UpdateProfileScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => UpdateProfileController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.termsCondition,
+      page: () => const TermsConditionScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => TermsConditionController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.privacyPolicy,
+      page: () => const PrivacyPolicyScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => PrivacyPolicyController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.jobDetails,
+      page: () => const JobDetailsScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => JobDetailsController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.deliveryProof,
+      page: () => const DeliveryProofScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => DeliveryProofController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.reportIssue,
+      page: () => const ReportIssusScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ReportIssusController());
       }),
     ),
   ];

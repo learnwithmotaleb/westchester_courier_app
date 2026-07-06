@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/utils/app_text_style/app_text_style.dart';
 import 'package:westchester/core/responsive_layout/dimensions.dart';
+import 'package:westchester/core/routes/route_path.dart';
 
 class RequestPage extends StatefulWidget {
   const RequestPage({super.key});
@@ -40,52 +42,115 @@ class _RequestPageState extends State<RequestPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ─────────────────────────────────────────────
+            // ── Header with stat card ───────────────────────────────
             Container(
+              width: double.infinity,
               color: AppColors.whiteColor,
-              padding: EdgeInsets.symmetric(
-                horizontal: Dimensions.w(20),
-                vertical: Dimensions.h(16),
+              padding: EdgeInsets.fromLTRB(
+                Dimensions.w(16),
+                Dimensions.h(16),
+                Dimensions.w(16),
+                Dimensions.h(12),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  _StatBadge(label: 'Pending Request', value: '4'),
-                  SizedBox(width: Dimensions.w(12)),
-                  _StatBadge(label: 'Accepted', value: '2'),
+                  // Stat card
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.symmetric(
+                      vertical: Dimensions.h(16),
+                      horizontal: Dimensions.w(16),
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.lightGreyColor,
+                      borderRadius: BorderRadius.circular(Dimensions.r(12)),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Pending Request',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.textSecondaryColor,
+                                ),
+                              ),
+                              SizedBox(height: Dimensions.h(6)),
+                              Text(
+                                '4',
+                                style: AppTextStyles.displayNumberSmall
+                                    .copyWith(
+                                      color: AppColors.textPrimaryColor,
+                                      fontSize: Dimensions.fs(28),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 1,
+                          height: Dimensions.h(40),
+                          color: AppColors.greyColor.withOpacity(0.3),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: Dimensions.w(16)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Accepted',
+                                  style: AppTextStyles.caption.copyWith(
+                                    color: AppColors.textSecondaryColor,
+                                  ),
+                                ),
+                                SizedBox(height: Dimensions.h(6)),
+                                Text(
+                                  '2',
+                                  style: AppTextStyles.displayNumberSmall
+                                      .copyWith(
+                                        color: AppColors.textPrimaryColor,
+                                        fontSize: Dimensions.fs(28),
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: Dimensions.h(12)),
+
+                  // Filters row
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _DropdownFilter(
+                          value: _selectedFilter,
+                          items: const ['All Request', 'Pending', 'Accepted'],
+                          onChanged: (v) =>
+                              setState(() => _selectedFilter = v!),
+                        ),
+                      ),
+                      SizedBox(width: Dimensions.w(10)),
+                      Expanded(
+                        child: _DropdownFilter(
+                          value: _selectedMonth,
+                          items: const ['This Month', 'Last Month', 'All Time'],
+                          onChanged: (v) => setState(() => _selectedMonth = v!),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
-
-            // ── Filters ────────────────────────────────────────────
-            Container(
-              color: AppColors.whiteColor,
-              padding: EdgeInsets.only(
-                left: Dimensions.w(16),
-                right: Dimensions.w(16),
-                bottom: Dimensions.h(12),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: _DropdownFilter(
-                      value: _selectedFilter,
-                      items: const ['All Request', 'Pending', 'Accepted'],
-                      onChanged: (v) => setState(() => _selectedFilter = v!),
-                    ),
-                  ),
-                  SizedBox(width: Dimensions.w(10)),
-                  Expanded(
-                    child: _DropdownFilter(
-                      value: _selectedMonth,
-                      items: const ['This Month', 'Last Month', 'All Time'],
-                      onChanged: (v) => setState(() => _selectedMonth = v!),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Divider(height: 1, color: AppColors.dividerColor),
 
             // ── List ───────────────────────────────────────────────
             Expanded(
@@ -101,8 +166,9 @@ class _RequestPageState extends State<RequestPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: Dimensions.h(10)),
+                        padding: EdgeInsets.symmetric(
+                          vertical: Dimensions.h(10),
+                        ),
                         child: Text(
                           group['date'],
                           style: AppTextStyles.h4.copyWith(
@@ -114,11 +180,16 @@ class _RequestPageState extends State<RequestPage> {
                       ...List.generate(
                         (group['items'] as List).length,
                         (i) => Padding(
-                          padding:
-                              EdgeInsets.only(bottom: Dimensions.h(12)),
+                          padding: EdgeInsets.only(bottom: Dimensions.h(12)),
                           child: _RequestCard(
-                            isAccepted:
-                                group['items'][i]['accepted'] as bool,
+                            isAccepted: group['items'][i]['accepted'] as bool,
+                            onViewDetails: () => Get.toNamed(
+                              RoutePath.jobDetails,
+                              arguments: {
+                                'isAccepted':
+                                    group['items'][i]['accepted'] as bool,
+                              },
+                            ),
                           ),
                         ),
                       ),
@@ -134,70 +205,34 @@ class _RequestPageState extends State<RequestPage> {
   }
 }
 
-// ── Stat Badge ───────────────────────────────────────────────────────────
-class _StatBadge extends StatelessWidget {
-  final String label;
-  final String value;
-  const _StatBadge({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          vertical: Dimensions.h(12),
-          horizontal: Dimensions.w(12),
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.lightGreyColor,
-          borderRadius: BorderRadius.circular(Dimensions.r(10)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.textSecondaryColor,
-              ),
-            ),
-            SizedBox(height: Dimensions.h(4)),
-            Text(
-              value,
-              style: AppTextStyles.displayNumberSmall.copyWith(
-                color: AppColors.textPrimaryColor,
-                fontSize: Dimensions.fs(28),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 // ── Dropdown Filter ──────────────────────────────────────────────────────
 class _DropdownFilter extends StatelessWidget {
   final String value;
   final List<String> items;
   final ValueChanged<String?> onChanged;
-  const _DropdownFilter(
-      {required this.value, required this.items, required this.onChanged});
+  const _DropdownFilter({
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: Dimensions.w(10)),
+      padding: EdgeInsets.symmetric(horizontal: Dimensions.w(12)),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.borderColor),
-        borderRadius: BorderRadius.circular(Dimensions.r(8)),
+        color: AppColors.lightGreyColor,
+        borderRadius: BorderRadius.circular(Dimensions.r(30)),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down,
-              color: AppColors.primaryColor),
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            color: AppColors.textPrimaryColor,
+            size: Dimensions.rs(18),
+          ),
           style: AppTextStyles.bodyText.copyWith(
             color: AppColors.textPrimaryColor,
           ),
@@ -214,7 +249,8 @@ class _DropdownFilter extends StatelessWidget {
 // ── Request Card ─────────────────────────────────────────────────────────
 class _RequestCard extends StatelessWidget {
   final bool isAccepted;
-  const _RequestCard({required this.isAccepted});
+  final VoidCallback? onViewDetails;
+  const _RequestCard({required this.isAccepted, this.onViewDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +258,7 @@ class _RequestCard extends StatelessWidget {
       padding: EdgeInsets.all(Dimensions.w(14)),
       decoration: BoxDecoration(
         color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(Dimensions.r(10)),
+        borderRadius: BorderRadius.circular(Dimensions.r(12)),
         boxShadow: [
           BoxShadow(
             color: AppColors.blackColor.withOpacity(0.04),
@@ -246,9 +282,10 @@ class _RequestCard extends StatelessWidget {
                       style: AppTextStyles.overline.copyWith(
                         color: AppColors.greyColor,
                         fontSize: Dimensions.fs(9),
+                        letterSpacing: 0.8,
                       ),
                     ),
-                    SizedBox(height: Dimensions.h(4)),
+                    SizedBox(height: Dimensions.h(6)),
                     Text(
                       '1426 Atlantic Ave,\nBrooklyn, NY 11216',
                       style: AppTextStyles.bodyText.copyWith(
@@ -261,11 +298,11 @@ class _RequestCard extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: Dimensions.h(14)),
+                padding: EdgeInsets.only(top: Dimensions.h(12)),
                 child: Icon(
                   Icons.arrow_forward,
-                  size: Dimensions.rs(18),
-                  color: AppColors.primaryColor,
+                  size: Dimensions.rs(16),
+                  color: AppColors.textPrimaryColor,
                 ),
               ),
               // Delivery
@@ -278,9 +315,10 @@ class _RequestCard extends StatelessWidget {
                       style: AppTextStyles.overline.copyWith(
                         color: AppColors.greyColor,
                         fontSize: Dimensions.fs(9),
+                        letterSpacing: 0.8,
                       ),
                     ),
-                    SizedBox(height: Dimensions.h(4)),
+                    SizedBox(height: Dimensions.h(6)),
                     Text(
                       '151 Newark Ave,\nJersey City, NJ 07302',
                       textAlign: TextAlign.right,
@@ -295,57 +333,60 @@ class _RequestCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: Dimensions.h(12)),
+          SizedBox(height: Dimensions.h(14)),
           Row(
             children: [
               Expanded(
-                child: ElevatedButton(
-                  onPressed: isAccepted ? null : () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isAccepted
-                        ? AppColors.primaryColor
-                        : AppColors.whiteColor,
-                    foregroundColor: isAccepted
-                        ? AppColors.whiteColor
-                        : AppColors.primaryColor,
-                    side: BorderSide(
+                child: GestureDetector(
+                  onTap: isAccepted ? null : () {},
+                  child: Container(
+                    height: Dimensions.h(38),
+                    decoration: BoxDecoration(
                       color: isAccepted
                           ? AppColors.primaryColor
-                          : AppColors.borderColor,
+                          : AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(Dimensions.r(30)),
+                      border: Border.all(
+                        color: AppColors.primaryColor,
+                        width: 1.2,
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(Dimensions.r(6)),
-                    ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: Dimensions.h(8)),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    isAccepted ? 'Accepted' : 'Accept',
-                    style: AppTextStyles.buttonSmall.copyWith(
-                      color: isAccepted
-                          ? AppColors.whiteColor
-                          : AppColors.primaryColor,
+                    alignment: Alignment.center,
+                    child: Text(
+                      isAccepted ? 'Accepted' : 'Accept',
+                      style: AppTextStyles.buttonSmall.copyWith(
+                        color: isAccepted
+                            ? AppColors.whiteColor
+                            : AppColors.primaryColor,
+                        fontSize: Dimensions.fs(13),
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
               SizedBox(width: Dimensions.w(10)),
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.borderColor),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(Dimensions.r(6)),
+                child: GestureDetector(
+                  onTap: onViewDetails,
+                  child: Container(
+                    height: Dimensions.h(38),
+                    decoration: BoxDecoration(
+                      color: AppColors.whiteColor,
+                      borderRadius: BorderRadius.circular(Dimensions.r(30)),
+                      border: Border.all(
+                        color: AppColors.greyColor.withOpacity(0.35),
+                        width: 1.2,
+                      ),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: Dimensions.h(8)),
-                  ),
-                  child: Text(
-                    'View Details',
-                    style: AppTextStyles.buttonSmall.copyWith(
-                      color: AppColors.textPrimaryColor,
+                    alignment: Alignment.center,
+                    child: Text(
+                      'View Details',
+                      style: AppTextStyles.buttonSmall.copyWith(
+                        color: AppColors.textPrimaryColor,
+                        fontWeight: FontWeight.w500,
+                        fontSize: Dimensions.fs(13),
+                      ),
                     ),
                   ),
                 ),

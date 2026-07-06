@@ -5,6 +5,8 @@ import 'package:westchester/utils/app_text_style/app_text_style.dart';
 import 'package:westchester/utils/app_icons/app_icons.dart';
 import 'package:westchester/core/responsive_layout/dimensions.dart';
 import 'package:westchester/widget/custom_svg_icon.dart';
+import 'package:westchester/presentation/bottom_nav/controller/bottom_nav_controller.dart';
+import 'package:westchester/core/routes/route_path.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -27,9 +29,22 @@ class HomePage extends StatelessWidget {
                 children: [
                   Image.asset(AppIcons.appLogo, width: Dimensions.w(110)),
                   const Spacer(),
-                  _AppBarButton(icon: AppIcons.search_icon),
-                  SizedBox(width: Dimensions.w(10)),
-                  _AppBarButton(icon: AppIcons.notification),
+                  IconButton(
+                    icon: Icon(
+                      Icons.search_rounded,
+                      color: AppColors.primaryColor,
+                      size: Dimensions.rs(24),
+                    ),
+                    onPressed: () {},
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.notifications_none_rounded,
+                      color: AppColors.primaryColor,
+                      size: Dimensions.rs(24),
+                    ),
+                    onPressed: () {},
+                  ),
                 ],
               ),
             ),
@@ -63,19 +78,13 @@ class HomePage extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          _StatItem(
-                            label: 'Pending Task',
-                            value: '16',
-                          ),
+                          _StatItem(label: 'Pending Task', value: '16'),
                           Container(
                             height: Dimensions.h(40),
                             width: 1,
                             color: AppColors.whiteColor.withOpacity(0.3),
                           ),
-                          _StatItem(
-                            label: 'Completed Task',
-                            value: '142',
-                          ),
+                          _StatItem(label: 'Completed Task', value: '142'),
                         ],
                       ),
                     ),
@@ -126,32 +135,6 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── AppBar Icon Button ─────────────────────────────────────────────────────
-class _AppBarButton extends StatelessWidget {
-  final String icon;
-  const _AppBarButton({required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: Dimensions.w(36),
-      height: Dimensions.w(36),
-      decoration: BoxDecoration(
-        // color: AppColors.appBarBtnColor,
-        borderRadius: BorderRadius.circular(Dimensions.r(8)),
-        border: Border.all(color: AppColors.appBarBtnBorderColor),
-      ),
-      child: Center(
-        child: CustomSvgIcon(
-          icon: icon,
-          size: Dimensions.rs(18),
-          color: AppColors.primaryColor,
         ),
       ),
     );
@@ -279,34 +262,36 @@ class _TaskCard extends StatelessWidget {
             children: [
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.find<BottomNavController>().changePage(2);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,
                     foregroundColor: AppColors.whiteColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(Dimensions.r(6)),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: Dimensions.h(8)),
+                    padding: EdgeInsets.symmetric(vertical: Dimensions.h(8)),
                     elevation: 0,
                   ),
-                  child: Text(
-                    'Open Map',
-                    style: AppTextStyles.buttonSmall,
-                  ),
+                  child: Text('Open Map', style: AppTextStyles.buttonSmall),
                 ),
               ),
               SizedBox(width: Dimensions.w(10)),
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Get.toNamed(
+                      RoutePath.jobDetails,
+                      arguments: {'isAccepted': true},
+                    );
+                  },
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: AppColors.borderColor),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(Dimensions.r(6)),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(vertical: Dimensions.h(8)),
+                    padding: EdgeInsets.symmetric(vertical: Dimensions.h(8)),
                   ),
                   child: Text(
                     'View Details',
