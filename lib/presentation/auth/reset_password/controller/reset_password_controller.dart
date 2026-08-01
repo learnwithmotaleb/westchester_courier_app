@@ -1,38 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:westchester/core/routes/route_path.dart';
 import 'package:westchester/helper/tost_message/show_snackbar.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
 
-class ChangePasswordController extends GetxController {
-  final currentPasswordController = TextEditingController();
-  final newPasswordController = TextEditingController();
-  final confirmPasswordController = TextEditingController();
+class ResetPasswordController extends GetxController {
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   final formKey = GlobalKey<FormState>();
   final RxBool isLoading = false.obs;
 
   final ApiClient _apiClient = ApiClient();
 
-  @override
-  void onClose() {
-    currentPasswordController.dispose();
-    newPasswordController.dispose();
-    confirmPasswordController.dispose();
-    super.onClose();
-  }
+  /// Email passed from reset OTP screen
+  String get _email =>
+      (Get.arguments as Map<String, dynamic>?)?['email']?.toString() ?? '';
 
-  void changePassword() async {
+  void resetPassword() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
     isLoading.value = true;
 
     try {
-      final response = await _apiClient.patch(
-        url: ApiUrl.changePassword,
-        isToken: true,
+      final response = await _apiClient.post(
+        url: ApiUrl.resetPassword,
         body: {
-          'oldPassword': currentPasswordController.text,
+          'email': _email,
           'newPassword': newPasswordController.text,
           'confirmPassword': confirmPasswordController.text,
         },
@@ -40,13 +36,16 @@ class ChangePasswordController extends GetxController {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         AppSnackBar.success(
-          response.body?['message'] ?? 'Password changed successfully!',
+          response.body?['message'] ??
+              'Password reset successful! Please sign in.',
         );
-        Get.back();
+        // Go back to login
+        Get.offAllNamed(RoutePath.login);
       } else {
-        final message = response.body?['message'] ??
+        final message =
+            response.body?['message'] ??
             response.body?['error'] ??
-            'Failed to change password. Please try again.';
+            'Failed to reset password. Please try again.';
         AppSnackBar.fail(message.toString());
       }
     } catch (e) {
@@ -54,5 +53,12 @@ class ChangePasswordController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+  @override
+  void onClose() {
+    newPasswordController.dispose();
+    confirmPasswordController.dispose();
+    super.onClose();
   }
 }

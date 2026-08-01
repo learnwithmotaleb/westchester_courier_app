@@ -17,4 +17,9 @@ class RoutePath {
   static const String jobDetails = '/JobDetailsScreen';
   static const String deliveryProof = '/DeliveryProofScreen';
   static const String reportIssue = '/ReportIssusScreen';
+
+  // ── Forgot Password Flow ──
+  static const String forgotPassword = '/ForgotPasswordScreen';
+  static const String resetOtp = '/ResetOtpScreen';
+  static const String resetPassword = '/ResetPasswordScreen';
 }

@@ -21,6 +21,15 @@ import '../../presentation/auth/verification_success/screen/verification_success
 import '../../presentation/auth/wellcome/screen/welcome_screen.dart';
 import '../../presentation/auth/wellcome/controller/welcome_controller.dart';
 
+import '../../presentation/auth/forgot_password/screen/forgot_password_screen.dart';
+import '../../presentation/auth/forgot_password/controller/forgot_password_controller.dart';
+
+import '../../presentation/auth/reset_otp/screen/reset_otp_screen.dart';
+import '../../presentation/auth/reset_otp/controller/reset_otp_controller.dart';
+
+import '../../presentation/auth/reset_password/screen/reset_password_screen.dart';
+import '../../presentation/auth/reset_password/controller/reset_password_controller.dart';
+
 import '../../presentation/bottom_nav/screen/bottom_nav_screen.dart';
 import '../../presentation/bottom_nav/controller/bottom_nav_controller.dart';
 
@@ -110,6 +119,33 @@ class AppRouter {
         Get.lazyPut(() => WelcomeController());
       }),
     ),
+
+    // ── Forgot Password Flow ──
+    GetPage(
+      name: RoutePath.forgotPassword,
+      page: () => const ForgotPasswordScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ForgotPasswordController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.resetOtp,
+      page: () => const ResetOtpScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ResetOtpController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.resetPassword,
+      page: () => const ResetPasswordScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => ResetPasswordController());
+      }),
+    ),
+
     GetPage(
       name: RoutePath.bottomNav,
       page: () => const BottomNavScreen(),

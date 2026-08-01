@@ -25,31 +25,33 @@ class TermsConditionScreen extends GetView<TermsConditionController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Terms & Conditions',
-                style: AppTextStyles.h3.copyWith(
-                  color: AppColors.textPrimaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Read the terms and conditions that govern your use of the app and our services.',
-                style: AppTextStyles.bodyText.copyWith(
-                  color: AppColors.textSecondaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(24)),
-              
               Expanded(
-                child: SingleChildScrollView(
-                  child: Text(
-                    '', // Empty for now as per design
-                    style: AppTextStyles.bodyText.copyWith(
-                      color: AppColors.textPrimaryColor,
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.description.value.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No terms available right now.',
+                        style: AppTextStyles.bodyText.copyWith(
+                          color: AppColors.textSecondaryColor,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SingleChildScrollView(
+                    child: Text(
+                      controller.description.value,
+                      style: AppTextStyles.bodyText.copyWith(
+                        color: AppColors.textPrimaryColor,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),

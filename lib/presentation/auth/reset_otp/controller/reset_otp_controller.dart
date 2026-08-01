@@ -5,7 +5,7 @@ import 'package:westchester/helper/tost_message/show_snackbar.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
 
-class OtpVerifyController extends GetxController {
+class ResetOtpController extends GetxController {
   final TextEditingController otpController = TextEditingController();
 
   final RxBool isLoading = false.obs;
@@ -13,11 +13,11 @@ class OtpVerifyController extends GetxController {
 
   final ApiClient _apiClient = ApiClient();
 
-  /// Email passed from signup screen
+  /// Email passed from forgot password screen
   String get _email =>
       (Get.arguments as Map<String, dynamic>?)?['email']?.toString() ?? '';
 
-  Future<void> emailVerifyProcess() async {
+  Future<void> verifyResetOtp() async {
     final otpText = otpController.text.trim();
 
     if (otpText.length != 6) {
@@ -29,23 +29,26 @@ class OtpVerifyController extends GetxController {
 
     try {
       final response = await _apiClient.post(
-        url: ApiUrl.activeAccount,
+        url: ApiUrl.verifyOtp,
         body: {
           'email': _email,
-          'activationCode': otpText,
+          'code': otpText,
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         AppSnackBar.success(
-          response.body?['message'] ?? 'Email verified successfully!',
+          response.body?['message'] ?? 'Code verified! Set your new password.',
         );
-        // Navigate to Driver Verification
-        Get.offAllNamed(RoutePath.driverVerification);
+        // Navigate to Reset Password screen, passing email
+        Get.toNamed(
+          RoutePath.resetPassword,
+          arguments: {'email': _email},
+        );
       } else {
         final message = response.body?['message'] ??
             response.body?['error'] ??
-            'Verification failed. Please check the code.';
+            'Invalid code. Please try again.';
         AppSnackBar.fail(message.toString());
       }
     } catch (e) {
@@ -55,7 +58,7 @@ class OtpVerifyController extends GetxController {
     }
   }
 
-  Future<void> resendOtpProcess() async {
+  Future<void> resendCode() async {
     if (_email.isEmpty) {
       AppSnackBar.fail('Email not found. Please go back and try again.');
       return;
@@ -65,18 +68,18 @@ class OtpVerifyController extends GetxController {
 
     try {
       final response = await _apiClient.post(
-        url: ApiUrl.resendOtp,
+        url: ApiUrl.forgotPassword,
         body: {'email': _email},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         AppSnackBar.success(
-          response.body?['message'] ?? 'OTP resent successfully!',
+          response.body?['message'] ?? 'Reset code resent successfully!',
         );
       } else {
         final message = response.body?['message'] ??
             response.body?['error'] ??
-            'Failed to resend OTP. Please try again.';
+            'Failed to resend code. Please try again.';
         AppSnackBar.fail(message.toString());
       }
     } catch (e) {
