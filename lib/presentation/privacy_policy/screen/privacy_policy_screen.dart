@@ -25,31 +25,33 @@ class PrivacyPolicyScreen extends GetView<PrivacyPolicyController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Privacy Policy',
-                style: AppTextStyles.h3.copyWith(
-                  color: AppColors.textPrimaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Learn how we collect, use, store, and protect your personal information.',
-                style: AppTextStyles.bodyText.copyWith(
-                  color: AppColors.textSecondaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(24)),
-              
               Expanded(
-                child: SingleChildScrollView(
-                  child: Text(
-                    '', // Empty for now as per design
-                    style: AppTextStyles.bodyText.copyWith(
-                      color: AppColors.textPrimaryColor,
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (controller.description.value.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No privacy policy available right now.',
+                        style: AppTextStyles.bodyText.copyWith(
+                          color: AppColors.textSecondaryColor,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return SingleChildScrollView(
+                    child: Text(
+                      controller.description.value,
+                      style: AppTextStyles.bodyText.copyWith(
+                        color: AppColors.textPrimaryColor,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                }),
               ),
             ],
           ),

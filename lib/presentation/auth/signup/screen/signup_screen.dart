@@ -24,12 +24,12 @@ class SignupScreen extends GetView<SignupController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: Dimensions.h(40)),
-              
+
               // App Logo
               Image.asset(AppIcons.appLogo, width: Dimensions.w(120)),
-              
+
               SizedBox(height: Dimensions.h(30)),
-              
+
               // Title
               Text(
                 "Sign up to\nWestchester Courier",
@@ -40,25 +40,34 @@ class SignupScreen extends GetView<SignupController> {
                   height: 1.3,
                 ),
               ),
-              
+
               SizedBox(height: Dimensions.h(40)),
-              
+
+              // Full Name Field
+              AppTextField(
+                controller: controller.nameController,
+                hint: "Full Name",
+                keyboardType: TextInputType.name,
+              ),
+
+              SizedBox(height: Dimensions.h(16)),
+
               // Email Field
               AppTextField(
                 controller: controller.emailController,
                 hint: "Email Address",
                 keyboardType: TextInputType.emailAddress,
               ),
-              
+
               SizedBox(height: Dimensions.h(16)),
-              
+
               // Create Password Field
               AppTextField(
                 controller: controller.passwordController,
                 hint: "Create Password",
                 obscure: true,
               ),
-              
+
               SizedBox(height: Dimensions.h(16)),
 
               // Confirm Password Field
@@ -69,20 +78,20 @@ class SignupScreen extends GetView<SignupController> {
               ),
 
               SizedBox(height: Dimensions.h(32)),
-              
+
               // Continue Button
               Obx(() => AppButton(
-                label: "Continue",
-                onPressed: controller.signup,
-                isLoading: controller.isLoading.value,
-                backgroundColor: AppColors.primaryColor,
-                textColor: AppColors.whiteColor,
-                borderSideColor: AppColors.primaryColor,
-                borderRadius: Dimensions.r(8),
-              )),
-              
+                    label: "Continue",
+                    onPressed: controller.signup,
+                    isLoading: controller.isLoading.value,
+                    backgroundColor: AppColors.primaryColor,
+                    textColor: AppColors.whiteColor,
+                    borderSideColor: AppColors.primaryColor,
+                    borderRadius: Dimensions.r(8),
+                  )),
+
               SizedBox(height: Dimensions.h(24)),
-              
+
               // Sign In Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

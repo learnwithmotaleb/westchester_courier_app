@@ -52,6 +52,15 @@ class DriverVerificationScreen extends GetView<DriverVerificationController> {
               ),
               
               SizedBox(height: Dimensions.h(40)),
+
+              // Full Name Field
+              AppTextField(
+                controller: controller.fullNameController,
+                hint: "Full Name",
+                keyboardType: TextInputType.name,
+              ),
+
+              SizedBox(height: Dimensions.h(16)),
               
               // Driving ID Field
               AppTextField(
@@ -66,8 +75,15 @@ class DriverVerificationScreen extends GetView<DriverVerificationController> {
               AppTextField(
                 controller: controller.dobController,
                 hint: "Date of Birth",
-                keyboardType: TextInputType.datetime,
-                // Alternatively you could add a trailing icon for calendar to open date picker
+                readOnly: true,
+                onTap: () => controller.selectDate(context),
+                suffixIcon: IconButton(
+                  icon: const Icon(
+                    Icons.calendar_today_outlined,
+                    color: AppColors.primaryColor,
+                  ),
+                  onPressed: () => controller.selectDate(context),
+                ),
               ),
               
               SizedBox(height: Dimensions.h(32)),

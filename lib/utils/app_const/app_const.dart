@@ -1,6 +1,4 @@
-// /utils/app_const/app_const.dart
 class AppConstants {
-
   // ===================== Language =====================
   static const String english = "en";
   static const String arabic = "ar";
@@ -13,9 +11,13 @@ class AppConstants {
   static String? token;       // Auth token
 
   // ===================== App Info ====================
-  static const String baseUrl = "https://api.yourapp.com";
+  static const String baseUrl = "https://nc5cnwcx-8001.inc1.devtunnels.ms"; // Keeping your previous devtunnels URL
   static const String appVersion = "1.0.0";
   static const int splashDelaySeconds = 3;
+
+  // ===================== API Keys ====================
+  static const String googleMapsApiKeyAndroid = "YOUR_ANDROID_GOOGLE_MAPS_API_KEY";
+  static const String googleMapsApiKeyIOS = "YOUR_IOS_GOOGLE_MAPS_API_KEY";
 
   // ===================== SharedPrefs Keys =============
   static const String tokenKey = "user_token";

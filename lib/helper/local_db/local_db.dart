@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:westchester/helper/local_db/shareprefs_helper.dart';
@@ -24,7 +23,7 @@ class SharePrefsHelper {
     if (value == null) return null;
 
     return PostCategoryType.values.firstWhere(
-          (e) => e.name == value,
+      (e) => e.name == value,
       orElse: () => PostCategoryType.move,
     );
   }
@@ -54,7 +53,7 @@ class SharePrefsHelper {
     if (value == null) return null;
 
     return AppRole.values.firstWhere(
-          (e) => e.name == value,
+      (e) => e.name == value,
       orElse: () => AppRole.CUSTOMER,
     );
   }

@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
 
     return Obx(() {
       return GetMaterialApp(
-        title: 'BestKits',
+        title: 'Westchester',
         debugShowCheckedModeBanner: false,
 
         // Theme Configuration
@@ -46,9 +46,7 @@ class MyApp extends StatelessWidget {
         builder: (context, child) {
           return Directionality(
             textDirection: TextDirection.ltr,
-            child: InternetWrapper(
-              child: child ?? const SizedBox(),
-            ),
+            child: InternetWrapper(child: child ?? const SizedBox()),
           );
         },
       );
