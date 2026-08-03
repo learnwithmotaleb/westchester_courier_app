@@ -24,6 +24,10 @@
 	<key>CFBundleName</key>
 	<string>westchester</string>
 
+	<!-- Google Maps API Key -->
+	<key>GMSApiKey</key>
+	<string>AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-Ubol</string>
+
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 

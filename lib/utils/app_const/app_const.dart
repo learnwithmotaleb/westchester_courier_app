@@ -5,19 +5,20 @@ class AppConstants {
   static String language = english; // default
 
   // ===================== User Session =================
-  static String? userId;      // Logged-in user ID
-  static String? userName;    // Optional: User name
-  static String? userEmail;   // Optional: User email
-  static String? token;       // Auth token
+  static String? userId; // Logged-in user ID
+  static String? userName; // Optional: User name
+  static String? userEmail; // Optional: User email
+  static String? token; // Auth token
 
   // ===================== App Info ====================
-  static const String baseUrl = "https://nc5cnwcx-8001.inc1.devtunnels.ms"; // Keeping your previous devtunnels URL
+  static const String baseUrl =
+      "https://nc5cnwcx-8001.inc1.devtunnels.ms"; // Keeping your previous devtunnels URL
   static const String appVersion = "1.0.0";
   static const int splashDelaySeconds = 3;
 
   // ===================== API Keys ====================
-  static const String googleMapsApiKeyAndroid = "YOUR_ANDROID_GOOGLE_MAPS_API_KEY";
-  static const String googleMapsApiKeyIOS = "YOUR_IOS_GOOGLE_MAPS_API_KEY";
+  static const String googleMapsApiKey =
+      'AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-Ubol';
 
   // ===================== SharedPrefs Keys =============
   static const String tokenKey = "user_token";
