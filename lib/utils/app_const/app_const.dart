@@ -18,7 +18,7 @@ class AppConstants {
 
   // ===================== API Keys ====================
   static const String googleMapsApiKey =
-      'AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-Ubol';
+      'AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-UboI';
 
   // ===================== SharedPrefs Keys =============
   static const String tokenKey = "user_token";

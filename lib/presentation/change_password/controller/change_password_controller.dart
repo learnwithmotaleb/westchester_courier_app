@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:westchester/helper/tost_message/show_snackbar.dart';
+import 'package:westchester/widget/app_alert.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
 
@@ -39,12 +40,18 @@ class ChangePasswordController extends GetxController {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final data = response.body;
         AppSnackBar.success(
-          response.body?['message'] ?? 'Password changed successfully!',
+          data?['message'] ?? 'Password changed successfully!',
         );
-        Get.back();
+
+        // Wait for the snackbar to show before going back
+        Future.delayed(const Duration(milliseconds: 1500), () {
+          Get.back();
+        });
       } else {
-        final message = response.body?['message'] ??
+        final message =
+            response.body?['message'] ??
             response.body?['error'] ??
             'Failed to change password. Please try again.';
         AppSnackBar.fail(message.toString());

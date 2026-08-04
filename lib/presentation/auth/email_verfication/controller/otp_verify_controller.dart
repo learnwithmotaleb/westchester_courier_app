@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:westchester/core/routes/route_path.dart';
+import 'package:westchester/helper/local_db/local_db.dart';
 import 'package:westchester/helper/tost_message/show_snackbar.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
@@ -40,6 +41,27 @@ class OtpVerifyController extends GetxController {
         AppSnackBar.success(
           response.body?['message'] ?? 'Email verified successfully!',
         );
+
+        // ── Save token returned by activate-account ──────────────
+        final data = response.body;
+        final token = data?['data']?['accessToken'] ??
+            data?['data']?['token'] ??
+            data?['accessToken'] ??
+            data?['token'] ??
+            '';
+        if (token.toString().isNotEmpty) {
+          await SharePrefsHelper.saveToken(token.toString());
+        }
+
+        // Save userId if present
+        final userId = data?['data']?['user']?['_id'] ??
+            data?['data']?['_id'] ??
+            data?['user']?['_id'] ??
+            '';
+        if (userId.toString().isNotEmpty) {
+          await SharePrefsHelper.saveUserId(userId.toString());
+        }
+
         // Navigate to Driver Verification
         Get.offAllNamed(RoutePath.driverVerification);
       } else {

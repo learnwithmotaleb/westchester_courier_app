@@ -53,24 +53,15 @@ class DriverVerificationScreen extends GetView<DriverVerificationController> {
               
               SizedBox(height: Dimensions.h(40)),
 
-              // Full Name Field
-              AppTextField(
-                controller: controller.fullNameController,
-                hint: "Full Name",
-                keyboardType: TextInputType.name,
-              ),
-
-              SizedBox(height: Dimensions.h(16)),
-              
               // Driving ID Field
               AppTextField(
                 controller: controller.drivingIdController,
                 hint: "Driving ID",
                 keyboardType: TextInputType.text,
               ),
-              
+
               SizedBox(height: Dimensions.h(16)),
-              
+
               // Date of Birth Field
               AppTextField(
                 controller: controller.dobController,
@@ -85,9 +76,27 @@ class DriverVerificationScreen extends GetView<DriverVerificationController> {
                   onPressed: () => controller.selectDate(context),
                 ),
               ),
-              
+
+              SizedBox(height: Dimensions.h(16)),
+
+              // Phone Number Field
+              AppTextField(
+                controller: controller.phoneNumberController,
+                hint: "Phone Number",
+                keyboardType: TextInputType.phone,
+              ),
+
+              SizedBox(height: Dimensions.h(16)),
+
+              // Address Field
+              AppTextField(
+                controller: controller.addressController,
+                hint: "Address",
+                keyboardType: TextInputType.streetAddress,
+              ),
+
               SizedBox(height: Dimensions.h(32)),
-              
+
               // Continue Button
               Obx(() => AppButton(
                 label: "Continue",

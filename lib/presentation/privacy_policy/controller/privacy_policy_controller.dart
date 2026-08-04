@@ -27,10 +27,11 @@ class PrivacyPolicyController extends GetxController {
         final model = PrivacyPolicyModel.fromJson(response.body);
         if (model.success == true && model.data?.description != null) {
           description.value = model.data!.description!;
-        } else {
-          AppSnackBar.fail(
-            model.message ?? "Failed to load Privacy Policy",
+          AppSnackBar.success(
+            model.message ?? "Privacy Policy loaded successfully",
           );
+        } else {
+          AppSnackBar.fail(model.message ?? "Failed to load Privacy Policy");
         }
       } else {
         final message =

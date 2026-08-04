@@ -28,6 +28,7 @@ class TermsConditionController extends GetxController {
         final model = TermsConditionModel.fromJson(response.body);
         if (model.success == true && model.data?.description != null) {
           description.value = model.data!.description!;
+          AppSnackBar.success(model.message ?? "Terms & Conditions loaded successfully");
         } else {
           AppSnackBar.fail(
             model.message ?? "Failed to load Terms & Conditions",

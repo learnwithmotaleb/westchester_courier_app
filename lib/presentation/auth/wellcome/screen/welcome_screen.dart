@@ -20,18 +20,20 @@ class WelcomeScreen extends GetView<WelcomeController> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               SizedBox(height: Dimensions.h(100)),
-              
+
               // Title
-              Text(
-                "Hi, Ronald Richards",
-                textAlign: TextAlign.center,
-                style: AppTextStyles.h2.copyWith(
-                  color: AppColors.primaryColor,
-                  fontWeight: FontWeight.w600,
+              Obx(
+                () => Text(
+                  "Hi, ${controller.userName.value.capitalizeFirst}",
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.h2.copyWith(
+                    color: AppColors.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               SizedBox(height: Dimensions.h(8)),
-              
+
               // Subtitle
               Text(
                 "Setup your Profile",
@@ -41,64 +43,80 @@ class WelcomeScreen extends GetView<WelcomeController> {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              
+
               SizedBox(height: Dimensions.h(60)),
-              
+
               // Profile Image Placeholder
               GestureDetector(
-                onTap: () {
-                  // Trigger image picker via controller
-                },
-                child: Container(
-                  width: Dimensions.w(120),
-                  height: Dimensions.w(120),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primaryColor.withOpacity(0.1),
-                    border: Border.all(color: AppColors.primaryColor, width: 2),
-                  ),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Icon(
-                        Icons.person,
-                        size: Dimensions.w(60),
-                        color: AppColors.primaryColor.withOpacity(0.4),
+                onTap: controller.pickImage,
+                child: Obx(() {
+                  final file = controller.selectedImage.value;
+                  return Container(
+                    width: Dimensions.w(120),
+                    height: Dimensions.w(120),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primaryColor.withOpacity(0.1),
+                      border: Border.all(
+                        color: AppColors.primaryColor,
+                        width: 2,
                       ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          padding: EdgeInsets.all(Dimensions.w(8)),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.whiteColor, width: 2),
+                      image: file != null
+                          ? DecorationImage(
+                              image: FileImage(file),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (file == null)
+                          Icon(
+                            Icons.person,
+                            size: Dimensions.w(60),
+                            color: AppColors.primaryColor.withOpacity(0.4),
                           ),
-                          child: Icon(
-                            Icons.edit,
-                            color: AppColors.whiteColor,
-                            size: Dimensions.w(16),
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Container(
+                            padding: EdgeInsets.all(Dimensions.w(8)),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.whiteColor,
+                                width: 2,
+                              ),
+                            ),
+                            child: Icon(
+                              Icons.edit,
+                              color: AppColors.whiteColor,
+                              size: Dimensions.w(16),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+
+              const Spacer(),
+
+              // Continue Button
+              Obx(
+                () => AppButton(
+                  label: "Continue",
+                  onPressed: controller.setupProfile,
+                  isLoading: controller.isLoading.value,
+                  backgroundColor: AppColors.primaryColor,
+                  textColor: AppColors.whiteColor,
+                  borderSideColor: AppColors.primaryColor,
+                  borderRadius: Dimensions.r(8),
                 ),
               ),
-              
-              const Spacer(),
-              
-              // Continue Button
-              Obx(() => AppButton(
-                label: "Continue",
-                onPressed: controller.setupProfile,
-                isLoading: controller.isLoading.value,
-                backgroundColor: AppColors.primaryColor,
-                textColor: AppColors.whiteColor,
-                borderSideColor: AppColors.primaryColor,
-                borderRadius: Dimensions.r(8),
-              )),
-              
+
               SizedBox(height: Dimensions.h(40)),
             ],
           ),

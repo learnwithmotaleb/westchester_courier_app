@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:westchester/core/responsive_layout/dimensions.dart';
+import 'package:westchester/core/routes/route_path.dart';
+import 'package:westchester/presentation/bottom_nav/page/setting/controller/setting_controller.dart';
+import 'package:westchester/service/api_url.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/utils/app_text_style/app_text_style.dart';
-import 'package:westchester/utils/assets_image/app_images.dart';
-import 'package:westchester/core/responsive_layout/dimensions.dart';
-import 'package:get/get.dart';
-import 'package:westchester/core/routes/route_path.dart';
 
-class ProfileCard extends StatelessWidget {
+class ProfileCard extends GetView<SettingController> {
   const ProfileCard({super.key});
 
   @override
@@ -21,58 +22,61 @@ class ProfileCard extends StatelessWidget {
         color: AppColors.scaffoldBgColor.withOpacity(0.5),
         borderRadius: BorderRadius.circular(Dimensions.r(20)),
       ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: Dimensions.w(30),
-            backgroundColor: AppColors.lightGreyColor,
-            backgroundImage: const AssetImage(AppImages.profileImage),
-          ),
-          SizedBox(height: Dimensions.h(12)),
-          Text(
-            'Ronald Richards',
-            style: AppTextStyles.h4.copyWith(
-              color: AppColors.textPrimaryColor,
-              fontWeight: FontWeight.w600,
+      child: Obx(() {
+        final isLoading = controller.isLoading.value;
+        final profile = controller.profile.value;
+
+        if (isLoading) {
+          return const Center(
+            child: CircularProgressIndicator(color: AppColors.primaryColor),
+          );
+        }
+
+        final imageUrl = ApiUrl.buildImageUrl(profile?.profileImage);
+
+        return Column(
+          children: [
+            CircleAvatar(
+              radius: Dimensions.w(30),
+              backgroundColor: AppColors.lightGreyColor,
+              backgroundImage: imageUrl.isNotEmpty
+                  ? NetworkImage(imageUrl)
+                  : null,
+              child: imageUrl.isEmpty
+                  ? Icon(
+                      Icons.person,
+                      size: Dimensions.w(30),
+                      color: AppColors.greyColor,
+                    )
+                  : null,
             ),
-          ),
-          SizedBox(height: Dimensions.h(4)),
-          Text(
-            'tim.jennings@example.com',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondaryColor,
-            ),
-          ),
-          SizedBox(height: Dimensions.h(2)),
-          Text(
-            'ID - 458926',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondaryColor,
-            ),
-          ),
-          SizedBox(height: Dimensions.h(16)),
-          OutlinedButton(
-            onPressed: () => Get.toNamed(RoutePath.updateProfile),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.greyColor.withOpacity(0.3)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(Dimensions.r(30)),
-              ),
-              padding: EdgeInsets.symmetric(
-                horizontal: Dimensions.w(40),
-                vertical: Dimensions.h(10),
-              ),
-            ),
-            child: Text(
-              'Edit Profile',
-              style: AppTextStyles.bodyText.copyWith(
+            SizedBox(height: Dimensions.h(12)),
+            Text(
+              profile?.name ?? '—',
+              style: AppTextStyles.h4.copyWith(
                 color: AppColors.textPrimaryColor,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-        ],
-      ),
+            SizedBox(height: Dimensions.h(4)),
+            Text(
+              profile?.email ?? '—',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondaryColor,
+              ),
+            ),
+            SizedBox(height: Dimensions.h(2)),
+            Text(
+              profile?.driverId != null ? 'ID - ${profile!.driverId}' : '—',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondaryColor,
+              ),
+            ),
+            SizedBox(height: Dimensions.h(5)),
+
+          ],
+        );
+      }),
     );
   }
 }

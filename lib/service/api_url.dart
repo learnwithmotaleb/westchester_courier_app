@@ -8,8 +8,7 @@ class ApiUrl {
   //══════════════════════════════════════════════════════════
 
   /// Change only this domain when switching servers.
-  static const String _mainDomain =
-      "https://nc5cnwcx-8001.inc1.devtunnels.ms";
+  static const String _mainDomain = "https://nc5cnwcx-8001.inc1.devtunnels.ms";
 
   static const String baseUrl = _mainDomain;
 
@@ -29,8 +28,7 @@ class ApiUrl {
     }
 
     // Already a complete URL
-    if (imagePath.startsWith('http://') ||
-        imagePath.startsWith('https://')) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
 
@@ -60,8 +58,16 @@ class ApiUrl {
   static const String resetPassword = '$baseUrl/auth/reset-password';
   static const String forgotPassword = '$baseUrl/auth/forgot-password';
   static const String verifyResetOtp = '$baseUrl/auth/verify-reset-otp';
-  static const String changePassword = '$baseUrl/auth/change-password';//Patch method
-  static const String termsCondition = '$baseUrl/terms-conditions';//get method
-  static const String privacyAndPolicy = '$baseUrl/privacy-policy';//get method
+  static const String changePassword =
+      '$baseUrl/auth/change-password'; //Patch method
+  static const String termsCondition = '$baseUrl/terms-conditions'; //get method
+  static const String privacyAndPolicy = '$baseUrl/privacy-policy'; //get method
 
+  static const String driverProfileVerification = '$baseUrl/profile/driver-setup'; //Path method
+  static const String driverProfileGet = '$baseUrl/profile/me'; //get method
+  static const String updateDriverProfile = '$baseUrl/profile/me'; //Patch method
+  static const String updateDriverPicture = '$baseUrl/profile/me'; //Patch method
+
+  // ── Socket ──────────────────────────────────────────────────
+  static const String socketUrl = _mainDomain; // Socket.IO connects to root domain
 }

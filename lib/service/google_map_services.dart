@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
@@ -13,6 +14,48 @@ class GoogleMapServices extends GetxService {
 
   final RxSet<Marker> markers = <Marker>{}.obs;
   final RxSet<Polyline> polylines = <Polyline>{}.obs;
+
+  // ── Current device GPS location ───────────────────────────────
+  final RxDouble currentLat = 41.033986.obs;
+  final RxDouble currentLng = (-73.762910).obs;
+  final RxBool isLocationReady = false.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchCurrentLocation();
+  }
+
+  /// Fetches the real device GPS position and updates [currentLat]/[currentLng].
+  Future<void> fetchCurrentLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever) return;
+
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      currentLat.value = position.latitude;
+      currentLng.value = position.longitude;
+      isLocationReady.value = true;
+
+      // Also update camera position to real location
+      initialCameraPosition.value = CameraPosition(
+        target: LatLng(position.latitude, position.longitude),
+        zoom: 14.0,
+      );
+
+      // Animate map if already open
+      animateCameraTo(LatLng(position.latitude, position.longitude));
+    } catch (_) {
+      // Falls back to default Westchester coordinates
+      isLocationReady.value = true;
+    }
+  }
 
   /// Initializes the map controller when the map is created.
   void onMapCreated(GoogleMapController controller) {

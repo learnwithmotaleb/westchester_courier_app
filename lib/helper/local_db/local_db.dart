@@ -150,4 +150,39 @@ class SharePrefsHelper {
   static Future<void> clearAll() async {
     await _prefs?.clear();
   }
+
+  // ================= USER SESSION (Login response) =================
+
+  /// Saves all fields from the login `user` object in one call.
+  static Future<void> saveUserSession({
+    required String userId,
+    required String email,
+    required String role,
+    required bool isProfileCompleted,
+    required bool isApproved,
+    required String approvalStatus,
+  }) async {
+    await _prefs?.setString(SharePrefsKeys.userId, userId);
+    await _prefs?.setString(SharePrefsKeys.userEmail, email);
+    await _prefs?.setString(SharePrefsKeys.userRole, role);
+    await _prefs?.setBool(SharePrefsKeys.isProfileCompleted, isProfileCompleted);
+    await _prefs?.setBool(SharePrefsKeys.isApproved, isApproved);
+    await _prefs?.setString(SharePrefsKeys.approvalStatus, approvalStatus);
+  }
+
+  static String? getUserEmail() =>
+      _prefs?.getString(SharePrefsKeys.userEmail);
+
+  static String? getUserRole() =>
+      _prefs?.getString(SharePrefsKeys.userRole);
+
+  static bool getIsProfileCompleted() =>
+      _prefs?.getBool(SharePrefsKeys.isProfileCompleted) ?? false;
+
+  static bool getIsApproved() =>
+      _prefs?.getBool(SharePrefsKeys.isApproved) ?? false;
+
+  static String? getApprovalStatus() =>
+      _prefs?.getString(SharePrefsKeys.approvalStatus);
 }
+

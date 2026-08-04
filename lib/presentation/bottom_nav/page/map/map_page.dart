@@ -346,7 +346,6 @@ class _LegendItem extends StatelessWidget {
 
   const _LegendItem({required this.color, required this.label});
 
-  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,

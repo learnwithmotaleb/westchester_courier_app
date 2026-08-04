@@ -8,4 +8,11 @@ class SharePrefsKeys {
   static const String themeMode = "theme_mode";
   static const String postCategory = 'post_category';
   static const String userData = "user_data";
-}
+
+  // ── Login user fields ─────────────────────────────────────────
+  static const String userEmail = "user_email";
+  static const String userRole = "user_role";
+  static const String isProfileCompleted = "is_profile_completed";
+  static const String isApproved = "is_approved";
+  static const String approvalStatus = "approval_status";
+}

@@ -7,14 +7,20 @@ import 'package:westchester/core/responsive_layout/dimensions.dart';
 import 'package:westchester/widget/custom_appbar.dart';
 import 'package:westchester/core/routes/route_path.dart';
 import 'package:westchester/widget/app_alert.dart';
+import 'package:westchester/presentation/bottom_nav/page/setting/controller/setting_controller.dart';
 import 'package:westchester/presentation/bottom_nav/page/setting/widget/setting_item.dart';
 import 'package:westchester/presentation/bottom_nav/page/setting/widget/profile_card.dart';
 
-class SettingPage extends StatelessWidget {
+class SettingPage extends GetView<SettingController> {
   const SettingPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Ensure controller is registered
+    if (!Get.isRegistered<SettingController>()) {
+      Get.put(SettingController());
+    }
+
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: const CommonAppBar(
@@ -30,9 +36,109 @@ class SettingPage extends StatelessWidget {
         child: Column(
           children: [
             const ProfileCard(),
-            SizedBox(height: Dimensions.h(24)),
+            SizedBox(height: Dimensions.h(16)),
 
-            // Settings list
+            // ── Profile Info Card ──────────────────────────────
+            Obx(() {
+              final p = controller.profile.value;
+              if (p == null) return const SizedBox.shrink();
+
+              // Format date of birth
+              String dob = '—';
+              if (p.dateOfBirth != null) {
+                try {
+                  final dt = DateTime.parse(p.dateOfBirth!);
+                  dob =
+                      '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+                } catch (_) {
+                  dob = p.dateOfBirth!;
+                }
+              }
+
+              // Approval status badge color
+              final statusColor = p.approvalStatus == 'APPROVED'
+                  ? Colors.green
+                  : p.approvalStatus == 'REJECTED'
+                  ? AppColors.redColor
+                  : Colors.orange;
+
+              return Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(
+                  horizontal: Dimensions.w(20),
+                  vertical: Dimensions.h(16),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.scaffoldBgColor.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(Dimensions.r(20)),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Profile Information',
+                      style: AppTextStyles.bodyText.copyWith(
+                        color: AppColors.textPrimaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: Dimensions.h(16)),
+                    _InfoRow(label: 'Phone', value: p.phoneNumber ?? '—'),
+                    _Divider(),
+                    _InfoRow(label: 'Address', value: p.address ?? '—'),
+                    _Divider(),
+                    _InfoRow(label: 'Date of Birth', value: dob),
+                    _Divider(),
+                    _InfoRow(label: 'Driver ID', value: p.driverId ?? '—'),
+                    _Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Approval Status',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.textSecondaryColor,
+                          ),
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Dimensions.w(10),
+                            vertical: Dimensions.h(4),
+                          ),
+                          decoration: BoxDecoration(
+                            color: statusColor.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.r(20),
+                            ),
+                          ),
+                          child: Text(
+                            p.approvalStatus ?? '—',
+                            style: AppTextStyles.caption.copyWith(
+                              color: statusColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    _Divider(),
+                    _InfoRow(
+                      label: 'Profile Completed',
+                      value: (p.isProfileCompleted ?? false) ? 'Yes' : 'No',
+                    ),
+                    _Divider(),
+                    _InfoRow(
+                      label: 'Online Status',
+                      value: (p.isOnline ?? false) ? 'Online' : 'Offline',
+                    ),
+                  ],
+                ),
+              );
+            }),
+
+            SizedBox(height: Dimensions.h(16)),
+
+            // ── Settings list ──────────────────────────────────
             Container(
               decoration: BoxDecoration(
                 color: AppColors.scaffoldBgColor.withOpacity(0.5),
@@ -89,7 +195,8 @@ class SettingPage extends StatelessWidget {
                     onTap: () {
                       AppAlerts.actionConfirm(
                         title: 'Confirm Logout',
-                        message: 'Are you sure you want to log out\nof your account?',
+                        message:
+                            'Are you sure you want to log out\nof your account?',
                         confirmLabel: 'Logout',
                         onConfirm: () => Get.offAllNamed(RoutePath.login),
                       );
@@ -127,9 +234,59 @@ class SettingPage extends StatelessWidget {
                 ],
               ),
             ),
+
+            SizedBox(height: Dimensions.h(24)),
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Private helper widgets ─────────────────────────────────────
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: Dimensions.h(4)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.textSecondaryColor,
+            ),
+          ),
+          Flexible(
+            child: Text(
+              value,
+              textAlign: TextAlign.end,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textPrimaryColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Divider extends StatelessWidget {
+  const _Divider();
+
+  @override
+  Widget build(BuildContext context) {
+    return Divider(
+      height: Dimensions.h(16),
+      color: AppColors.greyColor.withOpacity(0.15),
     );
   }
 }

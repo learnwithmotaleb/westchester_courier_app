@@ -34,8 +34,9 @@ class ApiClient {
       String? token = await SharePrefsHelper.getToken();
       if (token != null && token.isNotEmpty) {
         headers["Authorization"] = "Bearer $token";
+        log.i("✅ Token attached: ${token.substring(0, token.length.clamp(0, 20))}...");
       } else {
-        print("Token is missing!");
+        log.e("❌ Token is NULL or EMPTY — user may not be logged in or token was not saved!");
       }
     }
 
@@ -136,6 +137,9 @@ class ApiClient {
   /// ---------------- Logging -------------------------------------
   void _logRequest(String url, String method, [dynamic body]) {
     log.i("====== API [$method] Request ======\nURL: $url");
+    // Log stored token for debugging
+    final storedToken = SharePrefsHelper.getToken();
+    log.i("Stored token (sync check): ${storedToken != null && storedToken.isNotEmpty ? '${storedToken.substring(0, storedToken.length.clamp(0, 20))}...' : 'NULL / EMPTY'}");
     if (body != null) {
       if (body is Map) {
         try {
