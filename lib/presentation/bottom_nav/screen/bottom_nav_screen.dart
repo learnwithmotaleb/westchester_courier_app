@@ -4,9 +4,9 @@ import 'package:westchester/core/responsive_layout/dimensions.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/presentation/bottom_nav/controller/bottom_nav_controller.dart';
 import 'package:westchester/presentation/bottom_nav/widget/bottom_nav_item.dart';
-import 'package:westchester/presentation/bottom_nav/page/home/home_page.dart';
+import 'package:westchester/presentation/bottom_nav/page/home/screen/home_page.dart';
 import 'package:westchester/presentation/bottom_nav/page/request/request_page.dart';
-import 'package:westchester/presentation/bottom_nav/page/map/map_page.dart';
+import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
 import 'package:westchester/presentation/bottom_nav/page/setting/setting_page.dart';
 
 class BottomNavScreen extends StatelessWidget {

@@ -4,15 +4,19 @@ import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/utils/app_text_style/app_text_style.dart';
 import 'package:westchester/utils/app_icons/app_icons.dart';
 import 'package:westchester/core/responsive_layout/dimensions.dart';
-import 'package:westchester/widget/custom_svg_icon.dart';
 import 'package:westchester/presentation/bottom_nav/controller/bottom_nav_controller.dart';
 import 'package:westchester/core/routes/route_path.dart';
+import 'package:westchester/presentation/bottom_nav/page/home/controller/home_controller.dart';
+import 'package:westchester/presentation/bottom_nav/page/home/model/my_delivery_model.dart';
+import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(HomeController());
+
     return Scaffold(
       backgroundColor: AppColors.scaffoldBgColor,
       body: SafeArea(
@@ -59,41 +63,58 @@ class HomePage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // ── Stats Card ──────────────────────────────────
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: Dimensions.w(20),
-                        vertical: Dimensions.h(20),
-                      ),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            AppColors.primaryColor,
-                            AppColors.primaryLightColor,
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
+                    Obx(() {
+                      final isLoading = controller.isLoading.value;
+                      final hasError = controller.hasError.value;
+
+                      return Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: Dimensions.w(20),
+                          vertical: Dimensions.h(20),
                         ),
-                        borderRadius: BorderRadius.circular(Dimensions.r(14)),
-                      ),
-                      child: Row(
-                        children: [
-                          _StatItem(label: 'Pending Task', value: '16'),
-                          Container(
-                            height: Dimensions.h(40),
-                            width: 1,
-                            color: AppColors.whiteColor.withOpacity(0.3),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.primaryColor,
+                              AppColors.primaryLightColor,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
-                          _StatItem(label: 'Completed Task', value: '142'),
-                        ],
-                      ),
-                    ),
+                          borderRadius: BorderRadius.circular(Dimensions.r(14)),
+                        ),
+                        child: isLoading
+                            ? _StatsShimmer()
+                            : hasError
+                            ? _StatsError(onRetry: controller.fetchStats)
+                            : Row(
+                                children: [
+                                  _StatItem(
+                                    label: 'Pending Task',
+                                    value: controller.pendingTask,
+                                  ),
+                                  Container(
+                                    height: Dimensions.h(40),
+                                    width: 1,
+                                    color: AppColors.whiteColor.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                  _StatItem(
+                                    label: 'Completed Task',
+                                    value: controller.completedTask,
+                                  ),
+                                ],
+                              ),
+                      );
+                    }),
 
                     SizedBox(height: Dimensions.h(20)),
 
                     // ── Section Title ───────────────────────────────
                     Text(
-                      "Today's Tasks | Jul 24, 2026",
+                      "Your Tasks",
                       style: AppTextStyles.h4.copyWith(
                         color: AppColors.textPrimaryColor,
                         fontWeight: FontWeight.w700,
@@ -103,33 +124,46 @@ class HomePage extends StatelessWidget {
                     SizedBox(height: Dimensions.h(12)),
 
                     // ── Task List ───────────────────────────────────
-                    ...List.generate(
-                      4,
-                      (i) => Padding(
-                        padding: EdgeInsets.only(bottom: Dimensions.h(12)),
-                        child: const _TaskCard(),
-                      ),
-                    ),
+                    Obx(() {
+                      if (controller.isDeliveriesLoading.value) {
+                        return Center(
+                          child: CircularProgressIndicator(
+                            color: AppColors.primaryColor,
+                          ),
+                        );
+                      }
 
-                    SizedBox(height: Dimensions.h(8)),
+                      if (controller.hasDeliveriesError.value) {
+                        return Center(
+                          child: Text(
+                            'Failed to load deliveries.',
+                            style: AppTextStyles.bodyText,
+                          ),
+                        );
+                      }
 
-                    Text(
-                      "July 25, 2026",
-                      style: AppTextStyles.h4.copyWith(
-                        color: AppColors.textPrimaryColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
+                      if (controller.deliveriesList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            'No tasks found.',
+                            style: AppTextStyles.bodyText,
+                          ),
+                        );
+                      }
 
-                    SizedBox(height: Dimensions.h(12)),
-
-                    ...List.generate(
-                      2,
-                      (i) => Padding(
-                        padding: EdgeInsets.only(bottom: Dimensions.h(12)),
-                        child: const _TaskCard(),
-                      ),
-                    ),
+                      return Column(
+                        children: controller.deliveriesList
+                            .map(
+                              (data) => Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: Dimensions.h(12),
+                                ),
+                                child: _TaskCard(data: data),
+                              ),
+                            )
+                            .toList(),
+                      );
+                    }),
                   ],
                 ),
               ),
@@ -137,6 +171,133 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ── Stats Loading Shimmer ────────────────────────────────────────────────────
+class _StatsShimmer extends StatefulWidget {
+  @override
+  State<_StatsShimmer> createState() => _StatsShimmerState();
+}
+
+class _StatsShimmerState extends State<_StatsShimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _ctrl;
+  late Animation<double> _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 900),
+    )..repeat(reverse: true);
+    _anim = Tween<double>(
+      begin: 0.25,
+      end: 0.75,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  Widget _shimmerBox({required double w, required double h}) {
+    return AnimatedBuilder(
+      animation: _anim,
+      builder: (_, _) => Container(
+        width: w,
+        height: h,
+        decoration: BoxDecoration(
+          color: AppColors.whiteColor.withValues(alpha: _anim.value),
+          borderRadius: BorderRadius.circular(Dimensions.r(6)),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              _shimmerBox(w: Dimensions.w(80), h: Dimensions.h(12)),
+              SizedBox(height: Dimensions.h(8)),
+              _shimmerBox(w: Dimensions.w(50), h: Dimensions.h(28)),
+            ],
+          ),
+        ),
+        Container(
+          height: Dimensions.h(40),
+          width: 1,
+          color: AppColors.whiteColor.withValues(alpha: 0.3),
+        ),
+        Expanded(
+          child: Column(
+            children: [
+              _shimmerBox(w: Dimensions.w(90), h: Dimensions.h(12)),
+              SizedBox(height: Dimensions.h(8)),
+              _shimmerBox(w: Dimensions.w(50), h: Dimensions.h(28)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Stats Error State ────────────────────────────────────────────────────────
+class _StatsError extends StatelessWidget {
+  final VoidCallback onRetry;
+  const _StatsError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(
+          Icons.wifi_off_rounded,
+          color: AppColors.whiteColor.withValues(alpha: 0.7),
+          size: Dimensions.rs(18),
+        ),
+        SizedBox(width: Dimensions.w(8)),
+        Text(
+          'Failed to load',
+          style: AppTextStyles.caption.copyWith(
+            color: AppColors.whiteColor.withValues(alpha: 0.8),
+          ),
+        ),
+        SizedBox(width: Dimensions.w(12)),
+        GestureDetector(
+          onTap: onRetry,
+          child: Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: Dimensions.w(12),
+              vertical: Dimensions.h(6),
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.whiteColor.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(Dimensions.r(20)),
+              border: Border.all(
+                color: AppColors.whiteColor.withValues(alpha: 0.5),
+              ),
+            ),
+            child: Text(
+              'Retry',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.whiteColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -157,7 +318,7 @@ class _StatItem extends StatelessWidget {
             label,
             textAlign: TextAlign.center,
             style: AppTextStyles.caption.copyWith(
-              color: AppColors.whiteColor.withOpacity(0.8),
+              color: AppColors.whiteColor.withValues(alpha: 0.8),
             ),
           ),
           SizedBox(height: Dimensions.h(4)),
@@ -175,7 +336,8 @@ class _StatItem extends StatelessWidget {
 
 // ── Task Card ─────────────────────────────────────────────────────────────
 class _TaskCard extends StatelessWidget {
-  const _TaskCard();
+  final DeliveryData data;
+  const _TaskCard({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +348,7 @@ class _TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(Dimensions.r(10)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.blackColor.withOpacity(0.04),
+            color: AppColors.blackColor.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -211,12 +373,14 @@ class _TaskCard extends StatelessWidget {
                     ),
                     SizedBox(height: Dimensions.h(4)),
                     Text(
-                      '1426 Atlantic Ave,\nBrooklyn, NY 11216',
+                      data.pickupAddress ?? 'Unknown',
                       style: AppTextStyles.bodyText.copyWith(
                         color: AppColors.textPrimaryColor,
                         fontSize: Dimensions.fs(12),
                         fontWeight: FontWeight.w500,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -244,13 +408,15 @@ class _TaskCard extends StatelessWidget {
                     ),
                     SizedBox(height: Dimensions.h(4)),
                     Text(
-                      '151 Newark Ave,\nJersey City, NJ 07302',
+                      data.dropoffAddress ?? 'Unknown',
                       textAlign: TextAlign.right,
                       style: AppTextStyles.bodyText.copyWith(
                         color: AppColors.textPrimaryColor,
                         fontSize: Dimensions.fs(12),
                         fontWeight: FontWeight.w500,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -263,7 +429,10 @@ class _TaskCard extends StatelessWidget {
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    Get.find<BottomNavController>().changePage(2);
+                    Get.to(
+                      () => const MapPage(),
+                      arguments: {'id': data.id ?? ''},
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primaryColor,

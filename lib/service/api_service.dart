@@ -6,10 +6,17 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter/foundation.dart';
 import '../helper/local_db/local_db.dart';
 import '../helper/no_internet/controller/no_internet_controller.dart';
 
-final log = Logger();
+class CustomLogger {
+  void i(dynamic msg) => debugPrint('🔵 INFO: $msg');
+  void d(dynamic msg) => debugPrint('🟢 DEBUG: $msg');
+  void e(dynamic msg) => debugPrint('🔴 ERROR: $msg');
+}
+
+final log = CustomLogger();
 
 typedef ApiResult = Response;
 
@@ -34,9 +41,13 @@ class ApiClient {
       String? token = await SharePrefsHelper.getToken();
       if (token != null && token.isNotEmpty) {
         headers["Authorization"] = "Bearer $token";
-        log.i("✅ Token attached: ${token.substring(0, token.length.clamp(0, 20))}...");
+        log.i(
+          "✅ Token attached: ${token.substring(0, token.length.clamp(0, 20))}...",
+        );
       } else {
-        log.e("❌ Token is NULL or EMPTY — user may not be logged in or token was not saved!");
+        log.e(
+          "❌ Token is NULL or EMPTY — user may not be logged in or token was not saved!",
+        );
       }
     }
 
@@ -139,7 +150,9 @@ class ApiClient {
     log.i("====== API [$method] Request ======\nURL: $url");
     // Log stored token for debugging
     final storedToken = SharePrefsHelper.getToken();
-    log.i("Stored token (sync check): ${storedToken != null && storedToken.isNotEmpty ? '${storedToken.substring(0, storedToken.length.clamp(0, 20))}...' : 'NULL / EMPTY'}");
+    log.i(
+      "Stored token (sync check): ${storedToken != null && storedToken.isNotEmpty ? '${storedToken.substring(0, storedToken.length.clamp(0, 20))}...' : 'NULL / EMPTY'}",
+    );
     if (body != null) {
       if (body is Map) {
         try {

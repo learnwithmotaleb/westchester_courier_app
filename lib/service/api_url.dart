@@ -63,11 +63,23 @@ class ApiUrl {
   static const String termsCondition = '$baseUrl/terms-conditions'; //get method
   static const String privacyAndPolicy = '$baseUrl/privacy-policy'; //get method
 
-  static const String driverProfileVerification = '$baseUrl/profile/driver-setup'; //Path method
+  static const String driverProfileVerification =
+      '$baseUrl/profile/driver-setup'; //Path method
   static const String driverProfileGet = '$baseUrl/profile/me'; //get method
-  static const String updateDriverProfile = '$baseUrl/profile/me'; //Patch method
-  static const String updateDriverPicture = '$baseUrl/profile/me'; //Patch method
+  static const String updateDriverProfile =
+      '$baseUrl/profile/me'; //Patch method
+  static const String updateDriverPicture =
+      '$baseUrl/profile/me'; //Patch method
+
+  static const String deliveryStatsSummary =
+      '$baseUrl/deliveries/stats/summary'; //Get method
+  static const String deliveryMy = '$baseUrl/deliveries/my'; //Get method
+  static String deliveryDetails(String id) =>
+      '$baseUrl/deliveries/$id'; //Get method
+  static String openMap(String id) =>
+      '$baseUrl/deliveries/$id/map'; //Get method
 
   // ── Socket ──────────────────────────────────────────────────
-  static const String socketUrl = _mainDomain; // Socket.IO connects to root domain
+  static const String socketUrl =
+      _mainDomain; // Socket.IO connects to root domain
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:westchester/presentation/bottom_nav/page/map/map_page.dart';
+import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/utils/app_text_style/app_text_style.dart';
 import 'package:westchester/core/responsive_layout/dimensions.dart';
@@ -11,6 +11,7 @@ import 'package:westchester/widget/app_alert.dart';
 import 'package:westchester/core/routes/route_path.dart';
 import '../controller/job_details_controller.dart';
 import '../widget/job_detail_info_row.dart';
+import '../widget/route_info_card.dart';
 
 class JobDetailsScreen extends GetView<JobDetailsController> {
   const JobDetailsScreen({super.key});
@@ -26,9 +27,15 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
         onBack: () => Get.back(),
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          return Column(
+            children: [
+              Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
                   horizontal: Dimensions.w(16),
@@ -48,51 +55,61 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                     _SectionCard(
                       title: 'PARCEL DETAILS',
                       color: AppColors.primaryColor,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          JobDetailInfoRow(
-                            label: 'ITEMS count',
-                            value: '3 Items',
-                            icon: Icons.inventory_2_outlined,
-                          ),
-                          Divider(color: AppColors.dividerColor, height: 1),
-                          JobDetailInfoRow(
-                            label: 'WEIGHT',
-                            value: '12.4 Kilograms',
-                            icon: Icons.scale_outlined,
-                          ),
-                        ],
-                      ),
+                      child: Obx(() {
+                        final data = controller.deliveryData.value;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            JobDetailInfoRow(
+                              label: 'PARCEL TYPE',
+                              value: data?.parcelType ?? 'Box',
+                              icon: Icons.inventory_2_outlined,
+                            ),
+                            Divider(color: AppColors.dividerColor, height: 1),
+                            JobDetailInfoRow(
+                              label: 'WEIGHT',
+                              value: data?.weight ?? '12.4 Kilograms',
+                              icon: Icons.scale_outlined,
+                            ),
+                          ],
+                        );
+                      }),
                     ),
 
                     SizedBox(height: Dimensions.h(12)),
 
                     // Pickup Location Section
                     _SectionCard(
-                      title: 'PIC-UP LOCATION',
+                      title: 'PICK-UP LOCATION',
                       color: AppColors.primaryColor,
-                      child: Column(
-                        children: [
-                          JobDetailInfoRow(
-                            label: 'NAME',
-                            value: 'Heights Fitness JC Downtown',
-                            icon: Icons.business_outlined,
-                          ),
-                          Divider(color: AppColors.dividerColor, height: 1),
-                          JobDetailInfoRow(
-                            label: 'ADDRESS',
-                            value: '151 Newark Ave, Jersey City, NJ 07302',
-                            icon: Icons.location_on_outlined,
-                          ),
-                          Divider(color: AppColors.dividerColor, height: 1),
-                          JobDetailInfoRow(
-                            label: 'PHONE',
-                            value: '(671) 555-0110',
-                            icon: Icons.phone_outlined,
-                          ),
-                        ],
-                      ),
+                      child: Obx(() {
+                        final data = controller.deliveryData.value;
+                        return Column(
+                          children: [
+                            JobDetailInfoRow(
+                              label: 'NAME',
+                              value:
+                                  data?.customerName ??
+                                  'Heights Fitness JC Downtown',
+                              icon: Icons.business_outlined,
+                            ),
+                            Divider(color: AppColors.dividerColor, height: 1),
+                            JobDetailInfoRow(
+                              label: 'ADDRESS',
+                              value:
+                                  data?.pickupAddress ??
+                                  controller.pickupAddress.value,
+                              icon: Icons.location_on_outlined,
+                            ),
+                            Divider(color: AppColors.dividerColor, height: 1),
+                            JobDetailInfoRow(
+                              label: 'PHONE',
+                              value: data?.customerPhone ?? '(671) 555-0110',
+                              icon: Icons.phone_outlined,
+                            ),
+                          ],
+                        );
+                      }),
                     ),
 
                     SizedBox(height: Dimensions.h(12)),
@@ -101,29 +118,38 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                     _SectionCard(
                       title: 'DELIVERY LOCATION',
                       color: AppColors.redColor,
-                      child: Column(
-                        children: [
-                          JobDetailInfoRow(
-                            label: 'NAME',
-                            value: 'Midnight Tint',
-                            icon: Icons.business_outlined,
-                          ),
-                          Divider(color: AppColors.dividerColor, height: 1),
-                          JobDetailInfoRow(
-                            label: 'ADDRESS',
-                            value: '1426 Atlantic Ave, Brooklyn, NY 11216',
-                            icon: Icons.location_on_outlined,
-                          ),
-                          Divider(color: AppColors.dividerColor, height: 1),
-                          JobDetailInfoRow(
-                            label: 'PHONE',
-                            value: '(252) 555-0126',
-                            icon: Icons.phone_outlined,
-                          ),
-                        ],
-                      ),
+                      child: Obx(() {
+                        final data = controller.deliveryData.value;
+                        return Column(
+                          children: [
+                            JobDetailInfoRow(
+                              label: 'NAME',
+                              value: data?.receiverName ?? 'Midnight Tint',
+                              icon: Icons.business_outlined,
+                            ),
+                            Divider(color: AppColors.dividerColor, height: 1),
+                            JobDetailInfoRow(
+                              label: 'ADDRESS',
+                              value:
+                                  data?.dropoffAddress ??
+                                  controller.deliveryAddress.value,
+                              icon: Icons.location_on_outlined,
+                            ),
+                            Divider(color: AppColors.dividerColor, height: 1),
+                            JobDetailInfoRow(
+                              label: 'PHONE',
+                              value: data?.receiverPhone ?? '(252) 555-0126',
+                              icon: Icons.phone_outlined,
+                            ),
+                          ],
+                        );
+                      }),
                     ),
 
+                    // SizedBox(height: Dimensions.h(12)),
+                    //
+                    // // ── Route Info Card ──────────────────────────────────
+                    // const RouteInfoCard(),
                     SizedBox(height: Dimensions.h(16)),
 
                     // ── Real Google Map ──────────────────────────────────
@@ -140,10 +166,9 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                               'isJobDetailsMap': true,
                               'pickup': pickup,
                               'delivery': delivery,
-                              'pickupAddress':
-                                  JobDetailsController.pickupAddress,
+                              'pickupAddress': controller.pickupAddress.value,
                               'deliveryAddress':
-                                  JobDetailsController.deliveryAddress,
+                                  controller.deliveryAddress.value,
                               'markers': controller.markers.toList(),
                               'polylines': controller.polylines.toList(),
                             },
@@ -353,7 +378,8 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
               }),
             ),
           ],
-        ),
+        );
+        }),
       ),
     );
   }
