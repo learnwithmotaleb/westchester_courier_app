@@ -8,6 +8,7 @@ import 'package:westchester/utils/app_const/app_const.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
 import 'package:westchester/presentation/job_details/model/deliveries_model.dart';
+import 'package:westchester/service/google_map_services.dart';
 
 // ─── Vehicle Model ───────────────────────────────────────────────────────────
 class VehicleOption {
@@ -143,6 +144,10 @@ class JobDetailsController extends GetxController {
         if (model.success == true && model.data != null) {
           deliveryData.value = model.data;
           rxStep.value = _getStepFromStatus(model.data!.status);
+          
+          if (Get.isRegistered<GoogleMapServices>()) {
+            Get.find<GoogleMapServices>().activeDeliveryId.value = id;
+          }
           
           final pCoords = model.data!.pickupCoordinates?.coordinates;
           if (pCoords != null && pCoords.length >= 2) {
@@ -347,5 +352,10 @@ class JobDetailsController extends GetxController {
   void confirmPickup() => rxStep.value = 3;
   void arriveAtDelivery() => rxStep.value = 4;
   void completeDelivery() {} // Navigation triggered from UI
-  void markAsDone() => rxStep.value = 5;
+  void markAsDone() {
+    rxStep.value = 5;
+    if (Get.isRegistered<GoogleMapServices>()) {
+      Get.find<GoogleMapServices>().activeDeliveryId.value = '';
+    }
+  }
 }

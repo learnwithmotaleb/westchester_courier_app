@@ -1,7 +1,11 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
+import 'package:westchester/service/api_service.dart';
+import 'package:westchester/service/api_url.dart';
 
 class GoogleMapServices extends GetxService {
   GoogleMapController? mapController;
@@ -20,10 +24,51 @@ class GoogleMapServices extends GetxService {
   final RxDouble currentLng = (-73.762910).obs;
   final RxBool isLocationReady = false.obs;
 
+  // ── Live Location Update Variables ──────────────────────────────
+  final RxString activeDeliveryId = ''.obs;
+  Timer? _locationTimer;
+  final ApiClient _api = ApiClient();
+
   @override
   void onInit() {
     super.onInit();
     fetchCurrentLocation();
+    _startLiveLocationTimer();
+  }
+
+  @override
+  void onClose() {
+    _locationTimer?.cancel();
+    super.onClose();
+  }
+
+  void _startLiveLocationTimer() {
+    _locationTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      if (activeDeliveryId.value.isNotEmpty) {
+        try {
+          // Update current location quietly before sending
+          final Position position = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.high,
+          );
+          currentLat.value = position.latitude;
+          currentLng.value = position.longitude;
+
+          // Debug log
+          debugPrint(
+            '📍 Auto-updating live location for delivery ${activeDeliveryId.value} -> Lat: ${currentLat.value}, Lng: ${currentLng.value}',
+          );
+
+          // Call API
+          await _api.patch(
+            url: ApiUrl.liveLocationUpdate(activeDeliveryId.value),
+            isToken: true,
+            body: {"lng": currentLng.value, "lat": currentLat.value},
+          );
+        } catch (e) {
+          debugPrint('Live location update error: $e');
+        }
+      }
+    });
   }
 
   /// Fetches the real device GPS position and updates [currentLat]/[currentLng].

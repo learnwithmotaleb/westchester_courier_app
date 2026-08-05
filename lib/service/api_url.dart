@@ -76,8 +76,11 @@ class ApiUrl {
   static const String deliveryMy = '$baseUrl/deliveries/my'; //Get method
   static String deliveryDetails(String id) =>
       '$baseUrl/deliveries/$id'; //Get method
-  static String openMap(String id) =>
-      '$baseUrl/deliveries/$id/map'; //Get method
+  static String openMap(String id) => '$baseUrl/deliveries/$id/map'; //Get method
+  static String deliverRequests = '$baseUrl/deliveries/requests'; //Get method
+  static String deliveryProof(String id) => '$baseUrl/deliveries/$id/proof-of-delivery'; //Patch method
+  static String liveLocationUpdate(String deliveryId) => '$baseUrl/deliveries/$deliveryId/location'; //Patch method
+
 
   // ── Socket ──────────────────────────────────────────────────
   static const String socketUrl =

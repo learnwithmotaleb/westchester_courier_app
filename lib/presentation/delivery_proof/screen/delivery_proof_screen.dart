@@ -45,7 +45,7 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                         ),
                       ),
                       SizedBox(height: Dimensions.h(8)),
-                      
+
                       // Photo Upload Box
                       Obx(() {
                         final path = controller.rxImagePath.value;
@@ -56,8 +56,12 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                             height: Dimensions.h(120),
                             decoration: BoxDecoration(
                               color: AppColors.lightGreyColor.withOpacity(0.3),
-                              border: Border.all(color: AppColors.greyColor.withOpacity(0.3)),
-                              borderRadius: BorderRadius.circular(Dimensions.r(12)),
+                              border: Border.all(
+                                color: AppColors.greyColor.withOpacity(0.3),
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                Dimensions.r(12),
+                              ),
                             ),
                             child: path.isEmpty
                                 ? Icon(
@@ -66,7 +70,9 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                                     color: AppColors.greyColor,
                                   )
                                 : ClipRRect(
-                                    borderRadius: BorderRadius.circular(Dimensions.r(12)),
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.r(12),
+                                    ),
                                     child: Image.file(
                                       File(path),
                                       fit: BoxFit.cover,
@@ -91,39 +97,6 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                       AppTextField(
                         controller: controller.nameController,
                         hint: 'Your Name',
-                      ),
-                      SizedBox(height: Dimensions.h(24)),
-
-                      // Signature Header
-                      Center(
-                        child: Text(
-                          'Signature',
-                          style: AppTextStyles.labelLarge.copyWith(
-                            color: AppColors.textPrimaryColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: Dimensions.h(8)),
-                      // Signature Box with border
-                      Container(
-                        width: double.infinity,
-                        height: Dimensions.h(140),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(Dimensions.r(12)),
-                          border: Border.all(
-                            color: AppColors.greyColor.withOpacity(0.4),
-                            style: BorderStyle.solid,
-                          ),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Signature Here',
-                            style: AppTextStyles.bodyText.copyWith(
-                              color: AppColors.greyColor.withOpacity(0.6),
-                            ),
-                          ),
-                        ),
                       ),
                       SizedBox(height: Dimensions.h(24)),
                     ],
@@ -168,12 +141,14 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                     ),
                     SizedBox(height: Dimensions.h(12)),
                     // Submit button
-                    AppButton(
-                      label: 'Submit',
-                      onPressed: controller.submitProof,
-                      backgroundColor: AppColors.successColor,
-                      borderSideColor: AppColors.successColor,
-                    ),
+                    Obx(() => controller.isSubmitting.value
+                        ? const Center(child: CircularProgressIndicator())
+                        : AppButton(
+                            label: 'Submit',
+                            onPressed: controller.submitProof,
+                            backgroundColor: AppColors.successColor,
+                            borderSideColor: AppColors.successColor,
+                          )),
                   ],
                 ),
               ),
