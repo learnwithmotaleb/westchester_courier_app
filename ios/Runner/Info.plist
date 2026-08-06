@@ -88,10 +88,12 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Westchester Courier requires background location access for real-time courier tracking and delivery management.</string>
 
-	<!-- Background Location -->
+	<!-- Background Location and Notifications -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 
 	<!-- iOS 13+ Scene Support -->

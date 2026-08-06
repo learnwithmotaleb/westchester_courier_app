@@ -72,6 +72,16 @@ class SharePrefsHelper {
     return _prefs?.getString(SharePrefsKeys.token);
   }
 
+  // ================= FCM TOKEN =================
+
+  static Future<void> saveFcmToken(String token) async {
+    await _prefs?.setString(SharePrefsKeys.fcmToken, token);
+  }
+
+  static String? getFcmToken() {
+    return _prefs?.getString(SharePrefsKeys.fcmToken);
+  }
+
   // ================= REFRESH TOKEN =================
 
   static Future<void> saveRefreshToken(String token) async {
@@ -184,5 +194,14 @@ class SharePrefsHelper {
 
   static String? getApprovalStatus() =>
       _prefs?.getString(SharePrefsKeys.approvalStatus);
+
+  // ================= LOCAL NOTIFICATIONS =================
+  static Future<void> saveLocalNotifications(List<String> notificationsJsonList) async {
+    await _prefs?.setStringList('local_notifications_history', notificationsJsonList);
+  }
+
+  static List<String> getLocalNotifications() {
+    return _prefs?.getStringList('local_notifications_history') ?? [];
+  }
 }
 

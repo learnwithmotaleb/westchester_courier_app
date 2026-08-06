@@ -30,6 +30,13 @@ class HomeController extends GetxController {
     fetchMyDeliveries();
   }
 
+  Future<void> onRefresh() async {
+    await Future.wait([
+      fetchStats(),
+      fetchMyDeliveries(),
+    ]);
+  }
+
   // ─── API Call ─────────────────────────────────────────────────────────────
   Future<void> fetchStats() async {
     isLoading.value = true;

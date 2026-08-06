@@ -8,6 +8,7 @@ class SharePrefsKeys {
   static const String themeMode = "theme_mode";
   static const String postCategory = 'post_category';
   static const String userData = "user_data";
+  static const String fcmToken = "fcm_token";
 
   // ── Login user fields ─────────────────────────────────────────
   static const String userEmail = "user_email";

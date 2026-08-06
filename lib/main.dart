@@ -8,12 +8,21 @@ import 'global/language/controller/language_controller.dart';
 import 'helper/local_db/local_db.dart';
 import 'helper/no_internet/controller/no_internet_controller.dart';
 import 'service/google_map_services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'service/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize SharedPreferences first
   await SharePrefsHelper.init();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await FirebaseNotificationService().initialize();
 
   // Lock device orientation only on mobile
   if (PlatformHelper.isMobile) {

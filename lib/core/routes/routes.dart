@@ -39,7 +39,7 @@ import '../../presentation/account_setting/controller/account_setting_controller
 import '../../presentation/change_password/screen/change_password_screen.dart';
 import '../../presentation/change_password/controller/change_password_controller.dart';
 
-import '../../presentation/job_history/job_history_screen.dart';
+import '../../presentation/job_history/screen/job_history_screen.dart';
 import '../../presentation/job_history/controller/job_history_controller.dart';
 
 import '../../presentation/contact_support/screen/contact_support_screen.dart';
@@ -63,6 +63,8 @@ import '../../presentation/delivery_proof/controller/delivery_proof_controller.d
 import '../../presentation/report_issus/screen/report_issus_screen.dart';
 import '../../presentation/report_issus/controller/report_issus_controller.dart';
 
+import '../../presentation/notification/screen/notification_screen.dart';
+import '../../presentation/notification/controller/notification_controller.dart';
 
 class AppRouter {
   static final List<GetPage<dynamic>> pages = [
@@ -232,6 +234,14 @@ class AppRouter {
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
         Get.lazyPut(() => ReportIssusController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.notification,
+      page: () => const NotificationScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => NotificationController());
       }),
     ),
   ];

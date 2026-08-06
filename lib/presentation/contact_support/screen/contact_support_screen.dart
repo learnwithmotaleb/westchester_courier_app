@@ -24,58 +24,87 @@ class ContactSupportScreen extends GetView<ContactSupportController> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: Dimensions.w(20)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Contact & Support',
-                style: AppTextStyles.h3.copyWith(
-                  color: AppColors.textPrimaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(8)),
-              Text(
-                'Need help? Contact our support team for assistance with your account, deliveries, or any issues you encounter.',
-                style: AppTextStyles.bodyText.copyWith(
-                  color: AppColors.textSecondaryColor,
-                ),
-              ),
-              SizedBox(height: Dimensions.h(24)),
-              
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      AppTextField(
-                        controller: controller.nameController,
-                        hint: 'Enter Your Name',
-                      ),
-                      SizedBox(height: Dimensions.h(16)),
-                      AppTextField(
-                        controller: controller.emailController,
-                        hint: 'Enter Email Address',
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: Dimensions.h(16)),
-                      AppTextField(
-                        controller: controller.messageController,
-                        hint: 'Write here...',
-                        maxLines: 6,
-                      ),
-                    ],
+          child: Form(
+            key: controller.formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: Dimensions.h(8)),
+                Text(
+                  'Contact & Support',
+                  style: AppTextStyles.h3.copyWith(
+                    color: AppColors.textPrimaryColor,
                   ),
                 ),
-              ),
-              
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: Dimensions.h(20)),
-                child: AppButton(
-                  label: 'Submit',
-                  onPressed: controller.submit,
+                SizedBox(height: Dimensions.h(8)),
+                Text(
+                  'Need help? Contact our support team for assistance with your account, deliveries, or any issues you encounter.',
+                  style: AppTextStyles.bodyText.copyWith(
+                    color: AppColors.textSecondaryColor,
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: Dimensions.h(24)),
+
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        AppTextField(
+                          controller: controller.nameController,
+                          hint: 'Enter Your Name',
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Name is required';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: Dimensions.h(16)),
+                        AppTextField(
+                          controller: controller.emailController,
+                          hint: 'Enter Email Address',
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Email is required';
+                            }
+                            if (!GetUtils.isEmail(value.trim())) {
+                              return 'Enter a valid email address';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: Dimensions.h(16)),
+                        AppTextField(
+                          controller: controller.messageController,
+                          hint: 'Write here...',
+                          maxLines: 6,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Message is required';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: Dimensions.h(20)),
+                  child: Obx(
+                    () => AppButton(
+                      label: 'Submit',
+                      onPressed: controller.isLoading.value
+                          ? null
+                          : controller.submit,
+                      isLoading: controller.isLoading.value,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

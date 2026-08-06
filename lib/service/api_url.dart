@@ -8,7 +8,10 @@ class ApiUrl {
   //══════════════════════════════════════════════════════════
 
   /// Change only this domain when switching servers.
-  static const String _mainDomain = "https://nc5cnwcx-8001.inc1.devtunnels.ms";
+  // static const String _mainDomain = "https://nc5cnwcx-8001.inc1.devtunnels.ms";
+  // static const String _mainDomain = "http://10.10.20.52:8001";//live
+  static const String _mainDomain =
+      "https://nc5cnwcx-8001.inc1.devtunnels.ms"; //live
 
   static const String baseUrl = _mainDomain;
 
@@ -76,13 +79,39 @@ class ApiUrl {
   static const String deliveryMy = '$baseUrl/deliveries/my'; //Get method
   static String deliveryDetails(String id) =>
       '$baseUrl/deliveries/$id'; //Get method
-  static String openMap(String id) => '$baseUrl/deliveries/$id/map'; //Get method
+  static String openMap(String id) =>
+      '$baseUrl/deliveries/$id/map'; //Get method
   static String deliverRequests = '$baseUrl/deliveries/requests'; //Get method
-  static String deliveryProof(String id) => '$baseUrl/deliveries/$id/proof-of-delivery'; //Patch method
-  static String liveLocationUpdate(String deliveryId) => '$baseUrl/deliveries/$deliveryId/location'; //Patch method
+  static String deliveryProof(String id) =>
+      '$baseUrl/deliveries/$id/proof-of-delivery'; //Patch method
+  static String liveLocationUpdate(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/location'; //Patch method
+  static String contactSupport = '$baseUrl/support'; //post method
+  static String myHistory = '$baseUrl/deliveries/my-history'; //get method
+  static String report = '$baseUrl/reports'; //POst method
 
+  static String acceptRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/accept'; //Patch method
+  static String rejectRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/reject'; //Patch method
+  static String driverPickupRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/driver-to-pickup'; //Patch method
+  static String confirmPickupRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/picked-up'; //Patch method
+  static String inTransitRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/in-transit'; //Patch method
+  static String outForDeliveryRequest(String deliveryId) =>
+      '$baseUrl/deliveries/$deliveryId/out-for-delivery'; //Patch method
 
   // ── Socket ──────────────────────────────────────────────────
-  static const String socketUrl =
-      _mainDomain; // Socket.IO connects to root domain
+  static const String socketUrl = _mainDomain;
+
+  // ── Notification URLs ─────────────────────────────────────────
+  static const String updateFcmToken = '$baseUrl/auth/fcm-token'; // Update FCM Token
+  static const String notification = '$baseUrl/notifications'; // Get Notifications
+  static const String notificationReadAll = '$baseUrl/notifications/read-all'; // Read all
+
+  static String notificationDelete(String id) => '$baseUrl/notifications/$id'; // Delete notification
+  static String notificationRead(String id) => '$baseUrl/notifications/$id/read'; // Mark as read
+  static String notificationUnreadCount(String s) => '$baseUrl/notifications/unread-count'; // Get unread count
 }

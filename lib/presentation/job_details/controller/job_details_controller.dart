@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:westchester/core/routes/route_path.dart';
 import 'package:westchester/utils/app_const/app_const.dart';
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
@@ -28,11 +29,9 @@ class VehicleOption {
     required this.perKmRate,
   });
 
-  double etaMinutes(double distanceKm) =>
-      (distanceKm / speedKmh) * 60;
+  double etaMinutes(double distanceKm) => (distanceKm / speedKmh) * 60;
 
-  double fare(double distanceKm) =>
-      baseFare + (distanceKm * perKmRate);
+  double fare(double distanceKm) => baseFare + (distanceKm * perKmRate);
 }
 
 // ─── Vehicle Definitions ─────────────────────────────────────────────────────
@@ -67,6 +66,7 @@ class JobDetailsController extends GetxController {
   final ApiClient _api = ApiClient();
   final Rx<Data?> deliveryData = Rx<Data?>(null);
   final RxBool isLoading = true.obs;
+  final RxBool actionLoading = false.obs;
 
   // ─── Delivery Steps ─────────────────────────────────────────────────────────
   // 0: Unaccepted  1: Assigned  2: At Pickup  3: In Transit  4: At Drop  5: Done
@@ -108,8 +108,9 @@ class JobDetailsController extends GetxController {
       kVehicleOptions.firstWhere((v) => v.key == selectedVehicle.value);
 
   /// ETA in minutes for the currently selected vehicle
-  double get vehicleEtaMinutes =>
-      distanceKm.value > 0 ? selectedVehicleOption.etaMinutes(distanceKm.value) : 0;
+  double get vehicleEtaMinutes => distanceKm.value > 0
+      ? selectedVehicleOption.etaMinutes(distanceKm.value)
+      : 0;
 
   /// Delivery fare for the currently selected vehicle
   double get vehicleFare =>
@@ -126,8 +127,10 @@ class JobDetailsController extends GetxController {
     final args = Get.arguments as Map<String, dynamic>? ?? {};
     final bool isAccepted = args['isAccepted'] as bool? ?? false;
     rxStep.value = isAccepted ? 1 : 0;
-    
-    final id = args['id'] as String? ?? '6a71ec4d1988ecda1c263447'; // Use passed ID or fallback for testing
+
+    final id =
+        args['id'] as String? ??
+        '6a71ec4d1988ecda1c263447'; // Use passed ID or fallback for testing
     fetchDeliveryDetails(id);
   }
 
@@ -144,22 +147,28 @@ class JobDetailsController extends GetxController {
         if (model.success == true && model.data != null) {
           deliveryData.value = model.data;
           rxStep.value = _getStepFromStatus(model.data!.status);
-          
+
           if (Get.isRegistered<GoogleMapServices>()) {
             Get.find<GoogleMapServices>().activeDeliveryId.value = id;
           }
-          
+
           final pCoords = model.data!.pickupCoordinates?.coordinates;
           if (pCoords != null && pCoords.length >= 2) {
-            pickupLatLng.value = LatLng(pCoords[1].toDouble(), pCoords[0].toDouble());
+            pickupLatLng.value = LatLng(
+              pCoords[1].toDouble(),
+              pCoords[0].toDouble(),
+            );
           }
           final dCoords = model.data!.dropoffCoordinates?.coordinates;
           if (dCoords != null && dCoords.length >= 2) {
-            deliveryLatLng.value = LatLng(dCoords[1].toDouble(), dCoords[0].toDouble());
+            deliveryLatLng.value = LatLng(
+              dCoords[1].toDouble(),
+              dCoords[0].toDouble(),
+            );
           }
           pickupAddress.value = model.data!.pickupAddress ?? '';
           deliveryAddress.value = model.data!.dropoffAddress ?? '';
-          
+
           await _loadRoute();
           isLoading.value = false;
           return;
@@ -178,17 +187,18 @@ class JobDetailsController extends GetxController {
     switch (status) {
       case 'UNASSIGNED':
       case 'ASSIGNED':
-        return 0;
+        return 0; // step 0: Accept/Reject
       case 'DRIVER_ACCEPTED':
+        return 1; // step 1: Arrive at Pickup
       case 'DRIVER_TO_PICKUP':
-        return 1;
+        return 2; // step 2: Confirm Pickup
       case 'PICKED_UP':
+        return 3; // step 3: Arrive at Delivery
       case 'IN_TRANSIT':
-        return 3;
       case 'OUT_FOR_DELIVERY':
-        return 4;
+        return 4; // step 4: Complete Delivery
       case 'DELIVERED':
-        return 5;
+        return 5; // step 5: Done
       default:
         return 0;
     }
@@ -347,11 +357,106 @@ class JobDetailsController extends GetxController {
   }
 
   // ─── Job Step Actions ────────────────────────────────────────────────────────
-  void acceptRequest() => rxStep.value = 1;
-  void arriveAtPickup() => rxStep.value = 2;
-  void confirmPickup() => rxStep.value = 3;
-  void arriveAtDelivery() => rxStep.value = 4;
-  void completeDelivery() {} // Navigation triggered from UI
+  Future<void> _updateStatus(
+    String url,
+    int nextStep,
+    String successMsg,
+  ) async {
+    final id = deliveryData.value?.id;
+    if (id == null) return;
+
+    actionLoading.value = true;
+    try {
+      final response = await _api.patch(url: url, isToken: true);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body?['success'] == true) {
+          rxStep.value = nextStep;
+          // Show success but we can also use AppSnackBar if it exists
+          if (Get.isRegistered<GoogleMapServices>()) {
+            // Maybe refresh map/location stuff if needed
+          }
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          response.body?['message'] ?? 'Failed to update status',
+        );
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred. Please try again.');
+    } finally {
+      actionLoading.value = false;
+    }
+  }
+
+  Future<void> acceptRequest() async {
+    if (deliveryData.value?.id == null) return;
+    await _updateStatus(
+      ApiUrl.acceptRequest(deliveryData.value!.id!),
+      1,
+      'Request accepted',
+    );
+  }
+
+  Future<void> arriveAtPickup() async {
+    if (deliveryData.value?.id == null) return;
+    await _updateStatus(
+      ApiUrl.driverPickupRequest(deliveryData.value!.id!),
+      2,
+      'Arrived at pickup',
+    );
+  }
+
+  Future<void> confirmPickup() async {
+    if (deliveryData.value?.id == null) return;
+    await _updateStatus(
+      ApiUrl.confirmPickupRequest(deliveryData.value!.id!),
+      3,
+      'Pickup confirmed',
+    );
+  }
+
+  Future<void> arriveAtDelivery() async {
+    if (deliveryData.value?.id == null) return;
+    // UI step says Arrive at delivery but maps to In Transit/Out For Delivery etc.
+    // The previous step mapping had arriveAtDelivery() go to step 4.
+    await _updateStatus(
+      ApiUrl.inTransitRequest(deliveryData.value!.id!),
+      4,
+      'Arrived at delivery',
+    );
+  }
+
+  Future<void> completeDelivery() async {
+    Get.toNamed(RoutePath.deliveryProof);
+  } // Navigation triggered from UI
+
+  Future<void> rejectRequest() async {
+    final id = deliveryData.value?.id;
+    if (id == null) return;
+    actionLoading.value = true;
+    try {
+      final response = await _api.patch(
+        url: ApiUrl.rejectRequest(id),
+        isToken: true,
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body?['success'] == true) {
+          Get.back();
+        }
+      } else {
+        Get.snackbar(
+          'Error',
+          response.body?['message'] ?? 'Failed to reject request',
+        );
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred. Please try again.');
+    } finally {
+      actionLoading.value = false;
+    }
+  }
+
   void markAsDone() {
     rxStep.value = 5;
     if (Get.isRegistered<GoogleMapServices>()) {

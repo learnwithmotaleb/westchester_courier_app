@@ -9,6 +9,7 @@ import 'package:westchester/core/routes/route_path.dart';
 import 'package:westchester/presentation/bottom_nav/page/home/controller/home_controller.dart';
 import 'package:westchester/presentation/bottom_nav/page/home/model/my_delivery_model.dart';
 import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
+import 'package:westchester/presentation/notification/controller/notification_controller.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -16,6 +17,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(HomeController());
+    final notifController = Get.put(NotificationController(), permanent: true);
 
     return Scaffold(
       backgroundColor: AppColors.scaffoldBgColor,
@@ -41,130 +43,145 @@ class HomePage extends StatelessWidget {
                     ),
                     onPressed: () {},
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.notifications_none_rounded,
-                      color: AppColors.primaryColor,
-                      size: Dimensions.rs(24),
-                    ),
-                    onPressed: () {},
-                  ),
+                  Obx(() {
+                    return Badge(
+                      isLabelVisible: notifController.unreadCount.value > 0,
+                      label: Text(notifController.unreadCount.value.toString()),
+                      backgroundColor: Colors.red,
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.notifications_none_rounded,
+                          color: AppColors.primaryColor,
+                          size: Dimensions.rs(24),
+                        ),
+                        onPressed: () {
+                          Get.toNamed(RoutePath.notification);
+                        },
+                      ),
+                    );
+                  }),
                 ],
               ),
             ),
 
             Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Dimensions.w(16),
-                  vertical: Dimensions.h(16),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Stats Card ──────────────────────────────────
-                    Obx(() {
-                      final isLoading = controller.isLoading.value;
-                      final hasError = controller.hasError.value;
+              child: RefreshIndicator(
+                onRefresh: controller.onRefresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimensions.w(16),
+                    vertical: Dimensions.h(16),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Stats Card ──────────────────────────────────
+                      Obx(() {
+                        final isLoading = controller.isLoading.value;
+                        final hasError = controller.hasError.value;
 
-                      return Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: Dimensions.w(20),
-                          vertical: Dimensions.h(20),
-                        ),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [
-                              AppColors.primaryColor,
-                              AppColors.primaryLightColor,
-                            ],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
+                        return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: Dimensions.w(20),
+                            vertical: Dimensions.h(20),
                           ),
-                          borderRadius: BorderRadius.circular(Dimensions.r(14)),
-                        ),
-                        child: isLoading
-                            ? _StatsShimmer()
-                            : hasError
-                            ? _StatsError(onRetry: controller.fetchStats)
-                            : Row(
-                                children: [
-                                  _StatItem(
-                                    label: 'Pending Task',
-                                    value: controller.pendingTask,
-                                  ),
-                                  Container(
-                                    height: Dimensions.h(40),
-                                    width: 1,
-                                    color: AppColors.whiteColor.withValues(
-                                      alpha: 0.3,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                AppColors.primaryColor,
+                                AppColors.primaryLightColor,
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.r(14),
+                            ),
+                          ),
+                          child: isLoading
+                              ? _StatsShimmer()
+                              : hasError
+                              ? _StatsError(onRetry: controller.fetchStats)
+                              : Row(
+                                  children: [
+                                    _StatItem(
+                                      label: 'Pending Task',
+                                      value: controller.pendingTask,
                                     ),
-                                  ),
-                                  _StatItem(
-                                    label: 'Completed Task',
-                                    value: controller.completedTask,
-                                  ),
-                                ],
-                              ),
-                      );
-                    }),
-
-                    SizedBox(height: Dimensions.h(20)),
-
-                    // ── Section Title ───────────────────────────────
-                    Text(
-                      "Your Tasks",
-                      style: AppTextStyles.h4.copyWith(
-                        color: AppColors.textPrimaryColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-
-                    SizedBox(height: Dimensions.h(12)),
-
-                    // ── Task List ───────────────────────────────────
-                    Obx(() {
-                      if (controller.isDeliveriesLoading.value) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primaryColor,
-                          ),
-                        );
-                      }
-
-                      if (controller.hasDeliveriesError.value) {
-                        return Center(
-                          child: Text(
-                            'Failed to load deliveries.',
-                            style: AppTextStyles.bodyText,
-                          ),
-                        );
-                      }
-
-                      if (controller.deliveriesList.isEmpty) {
-                        return Center(
-                          child: Text(
-                            'No tasks found.',
-                            style: AppTextStyles.bodyText,
-                          ),
-                        );
-                      }
-
-                      return Column(
-                        children: controller.deliveriesList
-                            .map(
-                              (data) => Padding(
-                                padding: EdgeInsets.only(
-                                  bottom: Dimensions.h(12),
+                                    Container(
+                                      height: Dimensions.h(40),
+                                      width: 1,
+                                      color: AppColors.whiteColor.withValues(
+                                        alpha: 0.3,
+                                      ),
+                                    ),
+                                    _StatItem(
+                                      label: 'Completed Task',
+                                      value: controller.completedTask,
+                                    ),
+                                  ],
                                 ),
-                                child: _TaskCard(data: data),
-                              ),
-                            )
-                            .toList(),
-                      );
-                    }),
-                  ],
+                        );
+                      }),
+
+                      SizedBox(height: Dimensions.h(20)),
+
+                      // ── Section Title ───────────────────────────────
+                      Text(
+                        "Your Tasks",
+                        style: AppTextStyles.h4.copyWith(
+                          color: AppColors.textPrimaryColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+
+                      SizedBox(height: Dimensions.h(12)),
+
+                      // ── Task List ───────────────────────────────────
+                      Obx(() {
+                        if (controller.isDeliveriesLoading.value) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primaryColor,
+                            ),
+                          );
+                        }
+
+                        if (controller.hasDeliveriesError.value) {
+                          return Center(
+                            child: Text(
+                              'Failed to load deliveries.',
+                              style: AppTextStyles.bodyText,
+                            ),
+                          );
+                        }
+
+                        if (controller.deliveriesList.isEmpty) {
+                          return Center(
+                            child: Text(
+                              'No tasks found.',
+                              style: AppTextStyles.bodyText,
+                            ),
+                          );
+                        }
+
+                        return Column(
+                          children: controller.deliveriesList
+                              .map(
+                                (data) => Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: Dimensions.h(12),
+                                  ),
+                                  child: _TaskCard(data: data),
+                                ),
+                              )
+                              .toList(),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
               ),
             ),

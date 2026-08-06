@@ -29,356 +29,384 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
       body: SafeArea(
         child: Obx(() {
           if (controller.isLoading.value) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           }
           return Column(
             children: [
               Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Dimensions.w(16),
-                  vertical: Dimensions.h(16),
-                ),
-                child: Column(
-                  children: [
-                    // Stepper progress indicator
-                    Obx(
-                      () =>
-                          _StepperWidget(currentStep: controller.rxStep.value),
-                    ),
-
-                    SizedBox(height: Dimensions.h(20)),
-
-                    // Parcel Details
-                    _SectionCard(
-                      title: 'PARCEL DETAILS',
-                      color: AppColors.primaryColor,
-                      child: Obx(() {
-                        final data = controller.deliveryData.value;
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            JobDetailInfoRow(
-                              label: 'PARCEL TYPE',
-                              value: data?.parcelType ?? 'Box',
-                              icon: Icons.inventory_2_outlined,
-                            ),
-                            Divider(color: AppColors.dividerColor, height: 1),
-                            JobDetailInfoRow(
-                              label: 'WEIGHT',
-                              value: data?.weight ?? '12.4 Kilograms',
-                              icon: Icons.scale_outlined,
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-
-                    SizedBox(height: Dimensions.h(12)),
-
-                    // Pickup Location Section
-                    _SectionCard(
-                      title: 'PICK-UP LOCATION',
-                      color: AppColors.primaryColor,
-                      child: Obx(() {
-                        final data = controller.deliveryData.value;
-                        return Column(
-                          children: [
-                            JobDetailInfoRow(
-                              label: 'NAME',
-                              value:
-                                  data?.customerName ??
-                                  'Heights Fitness JC Downtown',
-                              icon: Icons.business_outlined,
-                            ),
-                            Divider(color: AppColors.dividerColor, height: 1),
-                            JobDetailInfoRow(
-                              label: 'ADDRESS',
-                              value:
-                                  data?.pickupAddress ??
-                                  controller.pickupAddress.value,
-                              icon: Icons.location_on_outlined,
-                            ),
-                            Divider(color: AppColors.dividerColor, height: 1),
-                            JobDetailInfoRow(
-                              label: 'PHONE',
-                              value: data?.customerPhone ?? '(671) 555-0110',
-                              icon: Icons.phone_outlined,
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-
-                    SizedBox(height: Dimensions.h(12)),
-
-                    // Delivery Location Section
-                    _SectionCard(
-                      title: 'DELIVERY LOCATION',
-                      color: AppColors.redColor,
-                      child: Obx(() {
-                        final data = controller.deliveryData.value;
-                        return Column(
-                          children: [
-                            JobDetailInfoRow(
-                              label: 'NAME',
-                              value: data?.receiverName ?? 'Midnight Tint',
-                              icon: Icons.business_outlined,
-                            ),
-                            Divider(color: AppColors.dividerColor, height: 1),
-                            JobDetailInfoRow(
-                              label: 'ADDRESS',
-                              value:
-                                  data?.dropoffAddress ??
-                                  controller.deliveryAddress.value,
-                              icon: Icons.location_on_outlined,
-                            ),
-                            Divider(color: AppColors.dividerColor, height: 1),
-                            JobDetailInfoRow(
-                              label: 'PHONE',
-                              value: data?.receiverPhone ?? '(252) 555-0126',
-                              icon: Icons.phone_outlined,
-                            ),
-                          ],
-                        );
-                      }),
-                    ),
-
-                    // SizedBox(height: Dimensions.h(12)),
-                    //
-                    // // ── Route Info Card ──────────────────────────────────
-                    // const RouteInfoCard(),
-                    SizedBox(height: Dimensions.h(16)),
-
-                    // ── Real Google Map ──────────────────────────────────
-                    Obx(() {
-                      final isLoading = controller.isMapLoading.value;
-                      final pickup = controller.pickupLatLng.value;
-                      final delivery = controller.deliveryLatLng.value;
-
-                      return GestureDetector(
-                        onTap: () {
-                          Get.to(
-                            () => const MapPage(),
-                            arguments: {
-                              'isJobDetailsMap': true,
-                              'pickup': pickup,
-                              'delivery': delivery,
-                              'pickupAddress': controller.pickupAddress.value,
-                              'deliveryAddress':
-                                  controller.deliveryAddress.value,
-                              'markers': controller.markers.toList(),
-                              'polylines': controller.polylines.toList(),
-                            },
-                          );
-                        },
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(Dimensions.r(12)),
-                          child: SizedBox(
-                            width: double.infinity,
-                            height: Dimensions.h(180),
-                            child: Stack(
-                              children: [
-                                // Loading shimmer
-                                if (isLoading)
-                                  Container(
-                                    color: Colors.grey[200],
-                                    child: const Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  )
-                                else
-                                  GoogleMap(
-                                    initialCameraPosition: CameraPosition(
-                                      target: LatLng(
-                                        (pickup.latitude + delivery.latitude) /
-                                            2,
-                                        (pickup.longitude +
-                                                delivery.longitude) /
-                                            2,
-                                      ),
-                                      zoom: 10,
-                                    ),
-                                    onMapCreated: controller.onMapCreated,
-                                    markers: controller.markers,
-                                    polylines: controller.polylines,
-                                    zoomControlsEnabled: false,
-                                    myLocationButtonEnabled: false,
-                                    scrollGesturesEnabled: true,
-                                    zoomGesturesEnabled: true,
-                                    rotateGesturesEnabled: false,
-                                    tiltGesturesEnabled: false,
-                                  ),
-
-                                // Fullscreen button
-                                Positioned(
-                                  top: Dimensions.h(10),
-                                  right: Dimensions.w(10),
-                                  child: Container(
-                                    padding: EdgeInsets.all(Dimensions.w(6)),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.whiteColor,
-                                      borderRadius: BorderRadius.circular(
-                                        Dimensions.r(6),
-                                      ),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: AppColors.blackColor
-                                              .withOpacity(0.12),
-                                          blurRadius: 4,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      Icons.fullscreen_rounded,
-                                      size: Dimensions.rs(18),
-                                      color: AppColors.textPrimaryColor,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                  ],
-                ),
-              ),
-            ),
-
-            // Bottom action buttons depending on current steps
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                Dimensions.w(16),
-                Dimensions.h(8),
-                Dimensions.w(16),
-                Dimensions.h(16),
-              ),
-              child: Obx(() {
-                final step = controller.rxStep.value;
-
-                if (step == 0) {
-                  return Column(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Dimensions.w(16),
+                    vertical: Dimensions.h(16),
+                  ),
+                  child: Column(
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                AppAlerts.actionConfirm(
-                                  title: 'Confirmation',
-                                  message:
-                                      'Are you sure you want to reject the Delivery Request?',
-                                  confirmLabel: 'Reject',
-                                  onConfirm: () => Get.back(),
-                                );
+                      // Stepper progress indicator
+                      Obx(
+                        () => _StepperWidget(
+                          currentStep: controller.rxStep.value,
+                        ),
+                      ),
+
+                      SizedBox(height: Dimensions.h(20)),
+
+                      // Parcel Details
+                      _SectionCard(
+                        title: 'PARCEL DETAILS',
+                        color: AppColors.primaryColor,
+                        child: Obx(() {
+                          final data = controller.deliveryData.value;
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              JobDetailInfoRow(
+                                label: 'PARCEL TYPE',
+                                value: data?.parcelType ?? 'Box',
+                                icon: Icons.inventory_2_outlined,
+                              ),
+                              Divider(color: AppColors.dividerColor, height: 1),
+                              JobDetailInfoRow(
+                                label: 'WEIGHT',
+                                value: data?.weight ?? '12.4 Kilograms',
+                                icon: Icons.scale_outlined,
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+
+                      SizedBox(height: Dimensions.h(12)),
+
+                      // Pickup Location Section
+                      _SectionCard(
+                        title: 'PICK-UP LOCATION',
+                        color: AppColors.primaryColor,
+                        child: Obx(() {
+                          final data = controller.deliveryData.value;
+                          return Column(
+                            children: [
+                              JobDetailInfoRow(
+                                label: 'NAME',
+                                value:
+                                    data?.customerName ??
+                                    'Heights Fitness JC Downtown',
+                                icon: Icons.business_outlined,
+                              ),
+                              Divider(color: AppColors.dividerColor, height: 1),
+                              JobDetailInfoRow(
+                                label: 'ADDRESS',
+                                value:
+                                    data?.pickupAddress ??
+                                    controller.pickupAddress.value,
+                                icon: Icons.location_on_outlined,
+                              ),
+                              Divider(color: AppColors.dividerColor, height: 1),
+                              JobDetailInfoRow(
+                                label: 'PHONE',
+                                value: data?.customerPhone ?? '(671) 555-0110',
+                                icon: Icons.phone_outlined,
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+
+                      SizedBox(height: Dimensions.h(12)),
+
+                      // Delivery Location Section
+                      _SectionCard(
+                        title: 'DELIVERY LOCATION',
+                        color: AppColors.redColor,
+                        child: Obx(() {
+                          final data = controller.deliveryData.value;
+                          return Column(
+                            children: [
+                              JobDetailInfoRow(
+                                label: 'NAME',
+                                value: data?.receiverName ?? 'Midnight Tint',
+                                icon: Icons.business_outlined,
+                              ),
+                              Divider(color: AppColors.dividerColor, height: 1),
+                              JobDetailInfoRow(
+                                label: 'ADDRESS',
+                                value:
+                                    data?.dropoffAddress ??
+                                    controller.deliveryAddress.value,
+                                icon: Icons.location_on_outlined,
+                              ),
+                              Divider(color: AppColors.dividerColor, height: 1),
+                              JobDetailInfoRow(
+                                label: 'PHONE',
+                                value: data?.receiverPhone ?? '(252) 555-0126',
+                                icon: Icons.phone_outlined,
+                              ),
+                            ],
+                          );
+                        }),
+                      ),
+
+                      // SizedBox(height: Dimensions.h(12)),
+                      //
+                      // // ── Route Info Card ──────────────────────────────────
+                      // const RouteInfoCard(),
+                      SizedBox(height: Dimensions.h(16)),
+
+                      // ── Real Google Map ──────────────────────────────────
+                      Obx(() {
+                        final isLoading = controller.isMapLoading.value;
+                        final pickup = controller.pickupLatLng.value;
+                        final delivery = controller.deliveryLatLng.value;
+
+                        return GestureDetector(
+                          onTap: () {
+                            Get.to(
+                              () => const MapPage(),
+                              arguments: {
+                                'isJobDetailsMap': true,
+                                'pickup': pickup,
+                                'delivery': delivery,
+                                'pickupAddress': controller.pickupAddress.value,
+                                'deliveryAddress':
+                                    controller.deliveryAddress.value,
+                                'markers': controller.markers.toList(),
+                                'polylines': controller.polylines.toList(),
                               },
-                              child: Container(
-                                height: Dimensions.h(48),
-                                decoration: BoxDecoration(
-                                  color: AppColors.redColor.withOpacity(0.05),
-                                  borderRadius: BorderRadius.circular(
-                                    Dimensions.r(12),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                              Dimensions.r(12),
+                            ),
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: Dimensions.h(180),
+                              child: Stack(
+                                children: [
+                                  // Loading shimmer
+                                  if (isLoading)
+                                    Container(
+                                      color: Colors.grey[200],
+                                      child: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                        target: LatLng(
+                                          (pickup.latitude +
+                                                  delivery.latitude) /
+                                              2,
+                                          (pickup.longitude +
+                                                  delivery.longitude) /
+                                              2,
+                                        ),
+                                        zoom: 10,
+                                      ),
+                                      onMapCreated: controller.onMapCreated,
+                                      markers: controller.markers,
+                                      polylines: controller.polylines,
+                                      zoomControlsEnabled: false,
+                                      myLocationButtonEnabled: false,
+                                      scrollGesturesEnabled: true,
+                                      zoomGesturesEnabled: true,
+                                      rotateGesturesEnabled: false,
+                                      tiltGesturesEnabled: false,
+                                    ),
+
+                                  // Fullscreen button
+                                  Positioned(
+                                    top: Dimensions.h(10),
+                                    right: Dimensions.w(10),
+                                    child: Container(
+                                      padding: EdgeInsets.all(Dimensions.w(6)),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.whiteColor,
+                                        borderRadius: BorderRadius.circular(
+                                          Dimensions.r(6),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: AppColors.blackColor
+                                                .withOpacity(0.12),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Icon(
+                                        Icons.fullscreen_rounded,
+                                        size: Dimensions.rs(18),
+                                        color: AppColors.textPrimaryColor,
+                                      ),
+                                    ),
                                   ),
-                                  border: Border.all(
-                                    color: AppColors.redColor,
-                                    width: 1,
-                                  ),
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  'Reject Request',
-                                  style: AppTextStyles.buttonSmall.copyWith(
-                                    color: AppColors.redColor,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                ],
                               ),
                             ),
                           ),
-                        ],
-                      ),
-                      SizedBox(height: Dimensions.h(8)),
-                      _ReportIssueButton(),
-                      SizedBox(height: Dimensions.h(8)),
-                      AppButton(
-                        label: 'Accept Request',
-                        onPressed: controller.acceptRequest,
-                        backgroundColor: AppColors.successColor,
-                        borderSideColor: AppColors.successColor,
-                      ),
+                        );
+                      }),
                     ],
-                  );
-                } else if (step == 1) {
-                  return Column(
-                    children: [
-                      _ReportIssueButton(),
-                      SizedBox(height: Dimensions.h(8)),
-                      AppButton(
-                        label: 'Arrive at Pickup',
-                        onPressed: controller.arriveAtPickup,
-                        backgroundColor: AppColors.primaryColor,
+                  ),
+                ),
+              ),
+
+              // Bottom action buttons depending on current steps
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  Dimensions.w(16),
+                  Dimensions.h(8),
+                  Dimensions.w(16),
+                  Dimensions.h(16),
+                ),
+                child: Obx(() {
+                  final step = controller.rxStep.value;
+
+                  if (step == 0) {
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: controller.actionLoading.value ? null : () {
+                                  AppAlerts.actionConfirm(
+                                    title: 'Confirmation',
+                                    message:
+                                        'Are you sure you want to reject the Delivery Request?',
+                                    confirmLabel: 'Reject',
+                                    onConfirm: () {
+                                      Get.back();
+                                      controller.rejectRequest();
+                                    },
+                                  );
+                                },
+                                child: Container(
+                                  height: Dimensions.h(48),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.redColor.withOpacity(0.05),
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.r(12),
+                                    ),
+                                    border: Border.all(
+                                      color: AppColors.redColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: controller.actionLoading.value
+                                      ? SizedBox(
+                                          width: Dimensions.w(24),
+                                          height: Dimensions.w(24),
+                                          child: const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: AppColors.redColor,
+                                          ),
+                                        )
+                                      : Text(
+                                          'Reject Request',
+                                          style: AppTextStyles.buttonSmall.copyWith(
+                                            color: AppColors.redColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        _ReportIssueButton(
+                          deliveryId: controller.deliveryData.value?.id ?? '',
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        AppButton(
+                          label: 'Accept Request',
+                          onPressed: controller.acceptRequest,
+                          backgroundColor: AppColors.successColor,
+                          borderSideColor: AppColors.successColor,
+                          isLoading: controller.actionLoading.value,
+                        ),
+                      ],
+                    );
+                  } else if (step == 1) {
+                    return Column(
+                      children: [
+                        _ReportIssueButton(
+                          deliveryId: controller.deliveryData.value?.id ?? '',
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        AppButton(
+                          label: 'Arrive at Pickup',
+                          onPressed: controller.arriveAtPickup,
+                          backgroundColor: AppColors.primaryColor,
+                          isLoading: controller.actionLoading.value,
+                        ),
+                      ],
+                    );
+                  } else if (step == 2) {
+                    return Column(
+                      children: [
+                        _ReportIssueButton(
+                          deliveryId: controller.deliveryData.value?.id ?? '',
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        AppButton(
+                          label: 'Confirm Pickup',
+                          onPressed: controller.confirmPickup,
+                          backgroundColor: AppColors.primaryColor,
+                          isLoading: controller.actionLoading.value,
+                        ),
+                      ],
+                    );
+                  } else if (step == 3) {
+                    return Column(
+                      children: [
+                        _ReportIssueButton(
+                          deliveryId: controller.deliveryData.value?.id ?? '',
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        AppButton(
+                          label: 'Arrive at Delivery',
+                          onPressed: controller.arriveAtDelivery,
+                          backgroundColor: AppColors.primaryColor,
+                          isLoading: controller.actionLoading.value,
+                        ),
+                      ],
+                    );
+                  } else if (step == 4) {
+                    return Column(
+                      children: [
+                        _ReportIssueButton(
+                          deliveryId: controller.deliveryData.value?.id ?? '',
+                        ),
+                        SizedBox(height: Dimensions.h(8)),
+                        AppButton(
+                          label: 'Complete Delivery',
+                          onPressed: () => Get.toNamed(RoutePath.deliveryProof),
+                          backgroundColor: AppColors.primaryColor,
+                        ),
+                      ],
+                    );
+                  } else {
+                    return AppButton(
+                      label: 'Job Completed',
+                      onPressed: () => Get.back(),
+                      backgroundColor: AppColors.successColor,
+                      borderSideColor: AppColors.successColor,
+                      leadingIcon: const Icon(
+                        Icons.check_circle_outline_rounded,
+                        color: AppColors.whiteColor,
+                        size: 20,
                       ),
-                    ],
-                  );
-                } else if (step == 2) {
-                  return Column(
-                    children: [
-                      _ReportIssueButton(),
-                      SizedBox(height: Dimensions.h(8)),
-                      AppButton(
-                        label: 'Confirm Pickup',
-                        onPressed: controller.confirmPickup,
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                    ],
-                  );
-                } else if (step == 3) {
-                  return Column(
-                    children: [
-                      _ReportIssueButton(),
-                      SizedBox(height: Dimensions.h(8)),
-                      AppButton(
-                        label: 'Arrive at Delivery',
-                        onPressed: controller.arriveAtDelivery,
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                    ],
-                  );
-                } else if (step == 4) {
-                  return Column(
-                    children: [
-                      _ReportIssueButton(),
-                      SizedBox(height: Dimensions.h(8)),
-                      AppButton(
-                        label: 'Complete Delivery',
-                        onPressed: () => Get.toNamed(RoutePath.deliveryProof),
-                        backgroundColor: AppColors.primaryColor,
-                      ),
-                    ],
-                  );
-                } else {
-                  return AppButton(
-                    label: 'Job Completed',
-                    onPressed: () => Get.back(),
-                    backgroundColor: AppColors.successColor,
-                    borderSideColor: AppColors.successColor,
-                    leadingIcon: const Icon(
-                      Icons.check_circle_outline_rounded,
-                      color: AppColors.whiteColor,
-                      size: 20,
-                    ),
-                  );
-                }
-              }),
-            ),
-          ],
-        );
+                    );
+                  }
+                }),
+              ),
+            ],
+          );
         }),
       ),
     );
@@ -386,10 +414,16 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
 }
 
 class _ReportIssueButton extends StatelessWidget {
+  final String deliveryId;
+  const _ReportIssueButton({required this.deliveryId});
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed(RoutePath.reportIssue),
+      onTap: () => Get.toNamed(
+        RoutePath.reportIssue,
+        arguments: {'deliveryId': deliveryId},
+      ),
       child: Container(
         width: double.infinity,
         height: Dimensions.h(48),

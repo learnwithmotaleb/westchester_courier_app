@@ -26,39 +26,42 @@ class GoogleMapServices extends GetxService {
 
   // ── Live Location Update Variables ──────────────────────────────
   final RxString activeDeliveryId = ''.obs;
-  Timer? _locationTimer;
+  StreamSubscription<Position>? _positionStreamSubscription;
   final ApiClient _api = ApiClient();
 
   @override
   void onInit() {
     super.onInit();
     fetchCurrentLocation();
-    _startLiveLocationTimer();
+    _startLocationStream();
   }
 
   @override
   void onClose() {
-    _locationTimer?.cancel();
+    _positionStreamSubscription?.cancel();
     super.onClose();
   }
 
-  void _startLiveLocationTimer() {
-    _locationTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+  void _startLocationStream() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // Updates only when moving >= 10 meters
+    );
+
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen((Position position) async {
+      // 1. Update current location state
+      currentLat.value = position.latitude;
+      currentLng.value = position.longitude;
+
+      // 2. Send API request if a delivery is active
       if (activeDeliveryId.value.isNotEmpty) {
         try {
-          // Update current location quietly before sending
-          final Position position = await Geolocator.getCurrentPosition(
-            desiredAccuracy: LocationAccuracy.high,
-          );
-          currentLat.value = position.latitude;
-          currentLng.value = position.longitude;
-
-          // Debug log
           debugPrint(
-            '📍 Auto-updating live location for delivery ${activeDeliveryId.value} -> Lat: ${currentLat.value}, Lng: ${currentLng.value}',
+            '📍 Distance >= 10m threshold met. Auto-updating live location for delivery ${activeDeliveryId.value} -> Lat: ${currentLat.value}, Lng: ${currentLng.value}',
           );
 
-          // Call API
           await _api.patch(
             url: ApiUrl.liveLocationUpdate(activeDeliveryId.value),
             isToken: true,

@@ -123,39 +123,61 @@ class RequestController extends GetxController {
     await fetchRequests();
   }
 
-  // Placeholder for Accept Request
-  void acceptRequest(String id) {
-    // In future, call an API like:
-    // await _api.post(url: '$baseUrl/deliveries/$id/accept', ...);
-    
-    // For now, mock the update locally
-    final index = requestsList.indexWhere((r) => r.sId == id);
-    if (index != -1) {
-      final request = requestsList[index];
-      request.isAccepted = true;
-      request.status = 'DRIVER_ACCEPTED';
-      request.statusLabel = 'Accepted';
-      requestsList[index] = request;
-      _groupRequests(); // refresh groups
+  // Accept Request
+  Future<void> acceptRequest(String id) async {
+    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    try {
+      final response = await _api.patch(url: ApiUrl.acceptRequest(id), isToken: true);
+      Get.back(); // close dialog
       
-      pendingCount.value = (pendingCount.value - 1).clamp(0, 9999);
-      acceptedCount.value += 1;
-      
-      Get.snackbar('Success', 'Request Accepted');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body != null && response.body['success'] == true) {
+          Get.snackbar('Success', response.body['message'] ?? 'Request Accepted');
+          
+          final index = requestsList.indexWhere((r) => r.sId == id);
+          if (index != -1) {
+            final request = requestsList[index];
+            request.isAccepted = true;
+            request.status = 'DRIVER_ACCEPTED';
+            request.statusLabel = 'Accepted';
+            requestsList[index] = request;
+            _groupRequests(); // refresh groups
+            
+            pendingCount.value = (pendingCount.value - 1).clamp(0, 9999);
+            acceptedCount.value += 1;
+          }
+        }
+      } else {
+        Get.snackbar('Error', response.body?['message'] ?? 'Failed to accept request');
+      }
+    } catch (e) {
+      Get.back();
+      Get.snackbar('Error', 'An error occurred while accepting request');
     }
   }
 
-  // Placeholder for Reject Request
-  void rejectRequest(String id) {
-    // In future, call an API like:
-    // await _api.post(url: '$baseUrl/deliveries/$id/reject', ...);
-    
-    // For now, mock the update locally
-    requestsList.removeWhere((r) => r.sId == id);
-    _groupRequests();
-    
-    pendingCount.value = (pendingCount.value - 1).clamp(0, 9999);
-    
-    Get.snackbar('Success', 'Request Rejected');
+  // Reject Request
+  Future<void> rejectRequest(String id) async {
+    Get.dialog(const Center(child: CircularProgressIndicator()), barrierDismissible: false);
+    try {
+      final response = await _api.patch(url: ApiUrl.rejectRequest(id), isToken: true);
+      Get.back(); // close dialog
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (response.body != null && response.body['success'] == true) {
+          Get.snackbar('Success', response.body['message'] ?? 'Request Rejected');
+          
+          requestsList.removeWhere((r) => r.sId == id);
+          _groupRequests();
+          
+          pendingCount.value = (pendingCount.value - 1).clamp(0, 9999);
+        }
+      } else {
+        Get.snackbar('Error', response.body?['message'] ?? 'Failed to reject request');
+      }
+    } catch (e) {
+      Get.back();
+      Get.snackbar('Error', 'An error occurred while rejecting request');
+    }
   }
 }
