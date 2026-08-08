@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:get/get.dart';
 import '../../../service/api_service.dart';
 import '../../../service/api_url.dart';
@@ -32,14 +33,24 @@ class NotificationController extends GetxController {
         url: ApiUrl.notification,
         isToken: true,
       );
-      if (response.statusCode == 200) {
-        final model = nm.NotificationModel.fromJson(response.body);
-        notifications.assignAll(model.data ?? []);
+      if (response.statusCode == 200 && response.body != null) {
+        try {
+          final dynamic body = response.body;
+          final Map<String, dynamic> jsonMap = body is String
+              ? jsonDecode(body)
+              : body;
+          final model = nm.NotificationModel.fromJson(jsonMap);
+          notifications.assignAll(model.data ?? []);
+        } catch (parseError) {
+          Get.log('JSON Parse Error in notifications: $parseError');
+        }
       } else {
-        AppSnackBar.fail(response.statusText ?? 'Failed to load notifications');
+        Get.log(
+          'Failed to load notifications: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
-      AppSnackBar.fail('Error: $e');
+      Get.log('Error fetching notifications: $e');
     } finally {
       isLoading.value = false;
     }

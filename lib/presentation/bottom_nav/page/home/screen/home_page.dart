@@ -11,14 +11,31 @@ import 'package:westchester/presentation/bottom_nav/page/home/model/my_delivery_
 import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
 import 'package:westchester/presentation/notification/controller/notification_controller.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(HomeController());
-    final notifController = Get.put(NotificationController(), permanent: true);
+  State<HomePage> createState() => _HomePageState();
+}
 
+class _HomePageState extends State<HomePage> {
+  late final HomeController controller;
+  late final NotificationController notifController;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(HomeController());
+    // Register NotificationController here — user is logged in at this point
+    notifController = Get.put(NotificationController(), permanent: true);
+    // Fetch unread count to show correct badge immediately
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifController.fetchUnreadCount();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.scaffoldBgColor,
       body: SafeArea(
@@ -35,14 +52,6 @@ class HomePage extends StatelessWidget {
                 children: [
                   Image.asset(AppIcons.appLogo, width: Dimensions.w(110)),
                   const Spacer(),
-                  // IconButton(
-                  //   icon: Icon(
-                  //     Icons.search_rounded,
-                  //     color: AppColors.primaryColor,
-                  //     size: Dimensions.rs(24),
-                  //   ),
-                  //   onPressed: () {},
-                  // ),
                   Obx(() {
                     return Badge(
                       isLabelVisible: notifController.unreadCount.value > 0,

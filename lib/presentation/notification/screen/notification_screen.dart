@@ -6,14 +6,30 @@ import '../../../../utils/app_colors/app_colors.dart';
 import '../controller/notification_controller.dart';
 import '../widget/notification_widget.dart'; // Fixed widget import name
 
-class NotificationScreen extends StatelessWidget {
+class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // If not found, put it
-    final controller = Get.put(NotificationController(), permanent: true);
+  State<NotificationScreen> createState() => _NotificationScreenState();
+}
 
+class _NotificationScreenState extends State<NotificationScreen> {
+  late final NotificationController controller;
+
+  @override
+  void initState() {
+    super.initState();
+    // Register or find the controller — user is logged in at this point
+    controller = Get.put(NotificationController(), permanent: true);
+    // Always refresh when screen opens
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.loadLocalNotifications();
+      controller.updateFcmToken();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: CommonAppBar(
@@ -26,7 +42,7 @@ class NotificationScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primaryColor, // Dark background for eye icon
+                  color: AppColors.primaryColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.visibility,

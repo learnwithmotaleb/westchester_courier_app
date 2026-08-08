@@ -11,7 +11,6 @@ import 'service/google_map_services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'service/notification_service.dart';
-import 'presentation/notification/controller/notification_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,9 +34,6 @@ void main() async {
   Get.put(InternetController(), permanent: true);
   Get.put(LanguageController(), permanent: true);
 
-  // Register NotificationController and update FCM token on startup
-  Get.put(NotificationController(), permanent: true);
-  Get.find<NotificationController>().updateFcmToken();
 
   // GoogleMapServices auto-fetches real GPS in onInit()
   // Location permission is already granted above before this runs
