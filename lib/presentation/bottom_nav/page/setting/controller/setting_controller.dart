@@ -4,6 +4,10 @@ import 'package:westchester/presentation/bottom_nav/page/setting/model/ProfileMo
 import 'package:westchester/service/api_service.dart';
 import 'package:westchester/service/api_url.dart';
 
+import '../../../../../core/routes/route_path.dart';
+import '../../../../../helper/local_db/local_db.dart';
+import '../../../../../helper/local_db/shareprefs_helper.dart';
+
 class SettingController extends GetxController {
   final ApiClient _apiClient = ApiClient();
 
@@ -39,5 +43,18 @@ class SettingController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+  }
+
+
+
+
+  static Future<void> logout() async {
+    await SharePrefsHelper.clearUserSession();
+
+    // Clear all GetX controllers
+    Get.deleteAll(force: true);
+
+    // Go to Login Screen
+    Get.offAllNamed(RoutePath.login);
   }
 }

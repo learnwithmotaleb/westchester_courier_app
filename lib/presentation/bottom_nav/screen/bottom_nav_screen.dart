@@ -6,7 +6,7 @@ import 'package:westchester/presentation/bottom_nav/controller/bottom_nav_contro
 import 'package:westchester/presentation/bottom_nav/widget/bottom_nav_item.dart';
 import 'package:westchester/presentation/bottom_nav/page/home/screen/home_page.dart';
 import 'package:westchester/presentation/bottom_nav/page/request/screen/request_page.dart';
-import 'package:westchester/presentation/bottom_nav/page/map/screen/map_page.dart';
+import 'package:westchester/presentation/my_map/screen/my_map_screen.dart';
 import 'package:westchester/presentation/bottom_nav/page/setting/setting_page.dart';
 
 class BottomNavScreen extends StatelessWidget {
@@ -15,7 +15,7 @@ class BottomNavScreen extends StatelessWidget {
   static const List<Widget> _pages = [
     HomePage(),
     RequestPage(),
-    MapPage(),
+    MyMapScreen(),
     SettingPage(),
   ];
 

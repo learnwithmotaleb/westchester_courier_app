@@ -3,19 +3,18 @@ import '../utils/app_colors/app_colors.dart';
 import '../utils/app_text_style/app_text_style.dart';
 
 class AppEmptyState extends StatelessWidget {
-  final IconData icon;
-  final String title;
+  final IconData ? icon;
+  final String? title;
   final String? subtitle;
   final Widget? action;
 
   const AppEmptyState({
     super.key,
-    required this.icon,
-    required this.title,
+    this.icon ,
+     this.title,
     this.subtitle,
     this.action,
   });
-
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -24,18 +23,10 @@ class AppEmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.primaryColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 40, color: AppColors.primaryColor),
-            ),
+            Icon(icon, size: 40, color: AppColors.primaryColor),
             const SizedBox(height: 16),
             Text(
-              title,
+              title!,
               textAlign: TextAlign.center,
               style: AppTextStyles.h3.copyWith(color: AppColors.blackColor),
             ),

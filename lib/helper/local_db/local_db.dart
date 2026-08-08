@@ -203,5 +203,35 @@ class SharePrefsHelper {
   static List<String> getLocalNotifications() {
     return _prefs?.getStringList('local_notifications_history') ?? [];
   }
+
+
+  // ================= LOGOUT / CLEAR USER SESSION =================
+
+  static Future<void> clearUserSession() async {
+    final keys = [
+      SharePrefsKeys.token,
+      SharePrefsKeys.refreshToken,
+      SharePrefsKeys.userId,
+      SharePrefsKeys.profileId,
+      SharePrefsKeys.userEmail,
+      SharePrefsKeys.userRole,
+      SharePrefsKeys.isProfileCompleted,
+      SharePrefsKeys.isApproved,
+      SharePrefsKeys.approvalStatus,
+      SharePrefsKeys.userData,
+      SharePrefsKeys.role,
+      SharePrefsKeys.postCategory,
+    ];
+
+    for (final key in keys) {
+      await _prefs?.remove(key);
+    }
+  }
+
+  /// Check whether user is logged in
+  static bool isLoggedIn() {
+    final token = getToken();
+    return token != null && token.isNotEmpty;
+  }
 }
 

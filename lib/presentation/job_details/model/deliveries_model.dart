@@ -145,7 +145,7 @@ class Data {
 }
 
   Data.fromJson(dynamic json) {
-    _id = json['_id'];
+    _id = json['_id']?.toString() ?? json['id']?.toString() ?? json['deliveryId']?.toString();
     _orderNumber = json['orderNumber'];
     _trackingToken = json['trackingToken'];
     _title = json['title'];

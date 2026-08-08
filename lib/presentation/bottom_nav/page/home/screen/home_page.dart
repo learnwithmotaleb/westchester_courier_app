@@ -469,7 +469,7 @@ class _TaskCard extends StatelessWidget {
                   onPressed: () {
                     Get.toNamed(
                       RoutePath.jobDetails,
-                      arguments: {'isAccepted': true},
+                      arguments: {'isAccepted': true, 'id': data.id},
                     );
                   },
                   style: OutlinedButton.styleFrom(

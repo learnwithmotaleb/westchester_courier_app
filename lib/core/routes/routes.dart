@@ -66,6 +66,9 @@ import '../../presentation/report_issus/controller/report_issus_controller.dart'
 import '../../presentation/notification/screen/notification_screen.dart';
 import '../../presentation/notification/controller/notification_controller.dart';
 
+import '../../presentation/my_map/screen/my_map_screen.dart';
+import '../../presentation/my_map/controller/my_map_controller.dart';
+
 class AppRouter {
   static final List<GetPage<dynamic>> pages = [
     GetPage(
@@ -225,7 +228,7 @@ class AppRouter {
       page: () => const DeliveryProofScreen(),
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
-        Get.lazyPut(() => DeliveryProofController());
+        Get.put(DeliveryProofController());
       }),
     ),
     GetPage(
@@ -233,7 +236,7 @@ class AppRouter {
       page: () => const ReportIssusScreen(),
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
-        Get.lazyPut(() => ReportIssusController());
+        Get.put(ReportIssusController());
       }),
     ),
     GetPage(
@@ -242,6 +245,14 @@ class AppRouter {
       transition: Transition.rightToLeft,
       binding: BindingsBuilder(() {
         Get.lazyPut(() => NotificationController());
+      }),
+    ),
+    GetPage(
+      name: RoutePath.myMap,
+      page: () => const MyMapScreen(),
+      transition: Transition.rightToLeft,
+      binding: BindingsBuilder(() {
+        Get.lazyPut(() => MyMapController());
       }),
     ),
   ];

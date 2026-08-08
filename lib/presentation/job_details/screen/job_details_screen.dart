@@ -170,6 +170,8 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                                     controller.deliveryAddress.value,
                                 'markers': controller.markers.toList(),
                                 'polylines': controller.polylines.toList(),
+                                'distanceText': controller.distanceText.value,
+                                'durationText': controller.etaText.value,
                               },
                             );
                           },
@@ -385,7 +387,12 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                         SizedBox(height: Dimensions.h(8)),
                         AppButton(
                           label: 'Complete Delivery',
-                          onPressed: () => Get.toNamed(RoutePath.deliveryProof),
+                          onPressed: () => Get.toNamed(
+                            RoutePath.deliveryProof,
+                            arguments: {
+                              'deliveryId': controller.deliveryData.value?.id ?? '',
+                            },
+                          ),
                           backgroundColor: AppColors.primaryColor,
                         ),
                       ],

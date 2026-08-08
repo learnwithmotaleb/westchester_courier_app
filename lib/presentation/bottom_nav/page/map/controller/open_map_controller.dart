@@ -46,6 +46,8 @@ class OpenMapController extends GetxController {
       final passedPolylines = args['polylines'] as List<Polyline>?;
       if (passedMarkers != null) markers.assignAll(passedMarkers.toSet());
       if (passedPolylines != null) polylines.assignAll(passedPolylines.toSet());
+      distanceText.value = args['distanceText'] as String? ?? '';
+      durationText.value = args['durationText'] as String? ?? '';
       pickupLatLng.value = pickup;
       deliveryLatLng.value = delivery;
       isLoading.value = false;

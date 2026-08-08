@@ -198,7 +198,9 @@ class SettingPage extends GetView<SettingController> {
                         message:
                             'Are you sure you want to log out\nof your account?',
                         confirmLabel: 'Logout',
-                        onConfirm: () => Get.offAllNamed(RoutePath.login),
+                        onConfirm: () async {
+                          await SettingController.logout();
+                        },
                       );
                     },
                     child: Container(

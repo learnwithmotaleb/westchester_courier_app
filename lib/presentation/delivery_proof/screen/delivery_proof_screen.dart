@@ -8,6 +8,7 @@ import 'package:westchester/widget/custom_appbar.dart';
 import 'package:westchester/widget/app_text_field.dart';
 import 'package:westchester/widget/app_button.dart';
 import 'package:westchester/core/routes/route_path.dart';
+import 'package:westchester/presentation/job_details/controller/job_details_controller.dart';
 import '../controller/delivery_proof_controller.dart';
 
 class DeliveryProofScreen extends GetView<DeliveryProofController> {
@@ -99,6 +100,63 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                         hint: 'Your Name',
                       ),
                       SizedBox(height: Dimensions.h(24)),
+                      // Signature Header
+                      Text(
+                        'Signature',
+                        style: AppTextStyles.labelLarge.copyWith(
+                          color: AppColors.textPrimaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: Dimensions.h(8)),
+                      // Signature Image Picker Box
+                      Obx(() {
+                        final sigPath = controller.rxSignaturePath.value;
+                        return GestureDetector(
+                          onTap: controller.pickSignatureImage,
+                          child: Container(
+                            width: double.infinity,
+                            height: Dimensions.h(160),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightGreyColor.withOpacity(0.3),
+                              border: Border.all(
+                                color: AppColors.greyColor.withOpacity(0.3),
+                              ),
+                              borderRadius: BorderRadius.circular(
+                                Dimensions.r(12),
+                              ),
+                            ),
+                            child: sigPath.isEmpty
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.image_outlined,
+                                        size: Dimensions.rs(32),
+                                        color: AppColors.greyColor,
+                                      ),
+                                      SizedBox(height: Dimensions.h(6)),
+                                      Text(
+                                        'Tap to select signature image',
+                                        style: AppTextStyles.caption.copyWith(
+                                          color: AppColors.greyColor,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(
+                                      Dimensions.r(12),
+                                    ),
+                                    child: Image.file(
+                                      File(sigPath),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      }),
+                      SizedBox(height: Dimensions.h(24)),
                     ],
                   ),
                 ),
@@ -111,7 +169,17 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                   children: [
                     // Report Issue Button
                     GestureDetector(
-                      onTap: () => Get.toNamed(RoutePath.reportIssue),
+                      onTap: () {
+                        String deliveryId = '';
+                        if (Get.isRegistered<JobDetailsController>()) {
+                          deliveryId = Get.find<JobDetailsController>()
+                              .deliveryData.value?.id ?? '';
+                        }
+                        Get.toNamed(
+                          RoutePath.reportIssue,
+                          arguments: {'deliveryId': deliveryId},
+                        );
+                      },
                       child: Container(
                         width: double.infinity,
                         height: Dimensions.h(48),
@@ -140,15 +208,15 @@ class DeliveryProofScreen extends GetView<DeliveryProofController> {
                       ),
                     ),
                     SizedBox(height: Dimensions.h(12)),
-                    // Submit button
-                    Obx(() => controller.isSubmitting.value
-                        ? const Center(child: CircularProgressIndicator())
-                        : AppButton(
-                            label: 'Submit',
-                            onPressed: controller.submitProof,
-                            backgroundColor: AppColors.successColor,
-                            borderSideColor: AppColors.successColor,
-                          )),
+                    Obx(
+                      () => AppButton(
+                        label: 'Submit',
+                        onPressed: controller.submitProof,
+                        backgroundColor: AppColors.successColor,
+                        borderSideColor: AppColors.successColor,
+                        isLoading: controller.isSubmitting.value,
+                      ),
+                    ),
                   ],
                 ),
               ),

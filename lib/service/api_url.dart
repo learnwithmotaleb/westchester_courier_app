@@ -10,6 +10,9 @@ class ApiUrl {
   /// Change only this domain when switching servers.
   // static const String _mainDomain = "https://nc5cnwcx-8001.inc1.devtunnels.ms";
   // static const String _mainDomain = "http://10.10.20.52:8001";//live
+  // static const String _mainDomain =
+  //     "https://nc5cnwcx-8001.inc1.devtunnels.ms"; //live
+  //
   static const String _mainDomain =
       "https://nc5cnwcx-8001.inc1.devtunnels.ms"; //live
 
@@ -103,6 +106,11 @@ class ApiUrl {
   static String outForDeliveryRequest(String deliveryId) =>
       '$baseUrl/deliveries/$deliveryId/out-for-delivery'; //Patch method
 
+  static String myMap = '$baseUrl/deliveries/my-map'; // Get method
+  static String myMapTypePickup = '$baseUrl/deliveries/my-map?type=pickup'; // Get method
+  static String myMapTypeDelivery = '$baseUrl/deliveries/my-map?type=delivery'; // Get method
+
+
   // ── Socket ──────────────────────────────────────────────────
   static const String socketUrl = _mainDomain;
 
@@ -114,4 +122,7 @@ class ApiUrl {
   static String notificationDelete(String id) => '$baseUrl/notifications/$id'; // Delete notification
   static String notificationRead(String id) => '$baseUrl/notifications/$id/read'; // Mark as read
   static String notificationUnreadCount(String s) => '$baseUrl/notifications/unread-count'; // Get unread count
+
+
+
 }

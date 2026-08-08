@@ -23,4 +23,5 @@ class RoutePath {
   static const String resetOtp = '/ResetOtpScreen';
   static const String resetPassword = '/ResetPasswordScreen';
   static const String notification = '/NotificationScreen';
+  static const String myMap = '/MyMapScreen';
 }

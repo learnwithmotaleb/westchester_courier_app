@@ -5,15 +5,28 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
-import 'package:logger/logger.dart';
 import 'package:flutter/foundation.dart';
 import '../helper/local_db/local_db.dart';
 import '../helper/no_internet/controller/no_internet_controller.dart';
 
 class CustomLogger {
-  void i(dynamic msg) => debugPrint('🔵 INFO: $msg');
-  void d(dynamic msg) => debugPrint('🟢 DEBUG: $msg');
-  void e(dynamic msg) => debugPrint('🔴 ERROR: $msg');
+  /// Flutter's debugPrint truncates at ~1020 chars.
+  /// This splits long messages into chunks so nothing is lost.
+  void _print(String prefix, dynamic msg) {
+    final full = '$prefix $msg';
+    const chunkSize = 800;
+    if (full.length <= chunkSize) {
+      debugPrint(full);
+    } else {
+      for (int i = 0; i < full.length; i += chunkSize) {
+        debugPrint(full.substring(i, i + chunkSize > full.length ? full.length : i + chunkSize));
+      }
+    }
+  }
+
+  void i(dynamic msg) => _print('🔵 INFO:', msg);
+  void d(dynamic msg) => _print('🟢 DEBUG:', msg);
+  void e(dynamic msg) => _print('🔴 ERROR:', msg);
 }
 
 final log = CustomLogger();
@@ -22,6 +35,7 @@ typedef ApiResult = Response;
 
 class ApiClient {
   static const defaultTimeout = Duration(seconds: 30);
+  static const multipartTimeout = Duration(seconds: 120); // longer for file uploads
 
   Future<Map<String, String>> _headers({
     bool isBasic = false,
@@ -355,11 +369,12 @@ class ApiClient {
         );
       }
 
-      // Send request with timeout
-      final streamed = await request.send().timeout(ApiClient.defaultTimeout);
+      // Send request with timeout — use longer timeout for file uploads
+      final streamed = await request.send().timeout(ApiClient.multipartTimeout);
 
-      // Convert streamed response to http.Response
-      final response = await http.Response.fromStream(streamed);
+      // Convert streamed response to http.Response (also with timeout)
+      final response = await http.Response.fromStream(streamed)
+          .timeout(ApiClient.multipartTimeout);
 
       log.i("Multipart Response Status: ${response.statusCode}");
       log.i("Multipart Response Body: ${response.body}");
