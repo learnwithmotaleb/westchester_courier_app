@@ -19,6 +19,7 @@ class LoginController extends GetxController {
   void login() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
+    final fcmToken = SharePrefsHelper.getFcmToken();
 
     // Validation
     if (email.isEmpty || password.isEmpty) {
@@ -36,7 +37,7 @@ class LoginController extends GetxController {
     try {
       final response = await _apiClient.post(
         url: ApiUrl.login,
-        body: {'email': email, 'password': password},
+        body: {'email': email, 'password': password, 'fcmToken': fcmToken},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

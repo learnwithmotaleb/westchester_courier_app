@@ -381,34 +381,12 @@ class _RequestCard extends StatelessWidget {
         children: [
           // Header info
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 request.orderNumber ?? '#N/A',
                 style: AppTextStyles.bodyText.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textPrimaryColor,
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Dimensions.w(8),
-                  vertical: Dimensions.h(4),
-                ),
-                decoration: BoxDecoration(
-                  color: isAccepted
-                      ? AppColors.successColor.withOpacity(0.1)
-                      : AppColors.warningColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(Dimensions.r(4)),
-                ),
-                child: Text(
-                  request.statusLabel ?? request.status ?? 'Pending',
-                  style: AppTextStyles.overline.copyWith(
-                    color: isAccepted
-                        ? AppColors.successColor
-                        : AppColors.warningColor,
-                    fontWeight: FontWeight.w600,
-                  ),
                 ),
               ),
             ],
@@ -538,26 +516,33 @@ class _RequestCard extends StatelessWidget {
                 ),
                 SizedBox(width: Dimensions.w(10)),
               ] else if (isAccepted) ...[
-                // Accepted Label (Alternative to button)
+                // Accepted — same filled style as Accept for consistency
                 Expanded(
                   child: Container(
                     height: Dimensions.h(38),
                     decoration: BoxDecoration(
-                      color: AppColors.successColor.withOpacity(0.1),
+                      color: AppColors.primaryColor,
                       borderRadius: BorderRadius.circular(Dimensions.r(30)),
-                      border: Border.all(
-                        color: AppColors.successColor,
-                        width: 1.2,
-                      ),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      'Accepted',
-                      style: AppTextStyles.buttonSmall.copyWith(
-                        color: AppColors.successColor,
-                        fontSize: Dimensions.fs(13),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          color: AppColors.whiteColor,
+                          size: Dimensions.rs(14),
+                        ),
+                        SizedBox(width: Dimensions.w(4)),
+                        Text(
+                          'Accepted',
+                          style: AppTextStyles.buttonSmall.copyWith(
+                            color: AppColors.whiteColor,
+                            fontSize: Dimensions.fs(13),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

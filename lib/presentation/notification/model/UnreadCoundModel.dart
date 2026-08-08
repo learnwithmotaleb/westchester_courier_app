@@ -1,20 +1,24 @@
-class UnreadCoundModel {
+class NotificationUnreadModel {
   bool? success;
+  int? statusCode;
   String? message;
-  UnreadData? data;
+  Data? data;
 
-  UnreadCoundModel({this.success, this.message, this.data});
+  NotificationUnreadModel(
+      {this.success, this.statusCode, this.message, this.data});
 
-  UnreadCoundModel.fromJson(Map<String, dynamic> json) {
+  NotificationUnreadModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];
+    statusCode = json['statusCode'];
     message = json['message'];
-    data = json['data'] != null ? UnreadData.fromJson(json['data']) : null;
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['success'] = success;
-    data['message'] = message;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['statusCode'] = this.statusCode;
+    data['message'] = this.message;
     if (this.data != null) {
       data['data'] = this.data!.toJson();
     }
@@ -22,18 +26,18 @@ class UnreadCoundModel {
   }
 }
 
-class UnreadData {
-  int? count;
+class Data {
+  int? unreadCount;
 
-  UnreadData({this.count});
+  Data({this.unreadCount});
 
-  UnreadData.fromJson(Map<String, dynamic> json) {
-    count = json['count'];
+  Data.fromJson(Map<String, dynamic> json) {
+    unreadCount = json['unreadCount'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['count'] = count;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['unreadCount'] = this.unreadCount;
     return data;
   }
 }

@@ -33,27 +33,7 @@ class NotificationItem extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Logo/Icon
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.primaryColor),
-            ),
-            child: const Center(
-              child: Text(
-                'b',
-                style: TextStyle(
-                  color: AppColors.primaryColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Nunito',
-                ),
-              ),
-            ),
-          ),
+
           const SizedBox(width: 12),
           // Content
           Expanded(
@@ -64,15 +44,13 @@ class NotificationItem extends StatelessWidget {
                   notification.title ?? '',
                   style: const TextStyle(
                     fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    fontStyle: FontStyle.italic,
                   ),
                 ),
-                if (notification.message != null &&
-                    notification.message!.isNotEmpty) ...[
+                if (notification.body != null &&
+                    notification.body!.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
-                    notification.message!,
+                    notification.body!,
                     style: TextStyle(fontSize: 11, color: Colors.grey[700]),
                   ),
                 ],

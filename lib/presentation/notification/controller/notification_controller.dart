@@ -4,6 +4,7 @@ import '../../../service/api_url.dart';
 import '../../../helper/tost_message/show_snackbar.dart';
 import '../model/NotificationModel.dart' as nm;
 import '../model/UnreadCoundModel.dart';
+import '../../../helper/local_db/local_db.dart';
 
 class NotificationController extends GetxController {
   final notifications = <nm.Data>[].obs;
@@ -51,8 +52,8 @@ class NotificationController extends GetxController {
         isToken: true,
       );
       if (response.statusCode == 200) {
-        final model = UnreadCoundModel.fromJson(response.body);
-        unreadCount.value = (model.data?.count ?? 0).toInt();
+        final model = NotificationUnreadModel.fromJson(response.body);
+        unreadCount.value = (model.data?.unreadCount ?? 0).toInt();
       }
     } catch (e) {
       // Silently fail for unread count
@@ -61,7 +62,7 @@ class NotificationController extends GetxController {
 
   Future<void> markAsRead(String id) async {
     final notification = notifications.firstWhereOrNull(
-      (n) => n.id?.toString() == id,
+      (n) => n.sId?.toString() == id,
     );
     if (notification != null && notification.isRead == false) {
       // Optimistic update
@@ -119,7 +120,7 @@ class NotificationController extends GetxController {
         isToken: true,
       );
       if (response.statusCode == 200) {
-        notifications.removeWhere((n) => n.id?.toString() == id);
+        notifications.removeWhere((n) => n.sId?.toString() == id);
         fetchUnreadCount(); // Refresh count just in case
       } else {
         AppSnackBar.fail(
@@ -128,6 +129,26 @@ class NotificationController extends GetxController {
       }
     } catch (e) {
       AppSnackBar.fail('Error: $e');
+    }
+  }
+
+  Future<void> updateFcmToken() async {
+    try {
+      String? fcmToken = SharePrefsHelper.getFcmToken();
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        final response = await ApiClient().patch(
+          url: ApiUrl.updateFcmToken,
+          body: {"fcmToken": fcmToken},
+          isToken: true,
+        );
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          Get.log('FCM token updated successfully');
+        } else {
+          Get.log('Failed to update FCM token');
+        }
+      }
+    } catch (e) {
+      Get.log('Error updating FCM token: $e');
     }
   }
 }

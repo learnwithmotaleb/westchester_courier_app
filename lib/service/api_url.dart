@@ -107,22 +107,26 @@ class ApiUrl {
       '$baseUrl/deliveries/$deliveryId/out-for-delivery'; //Patch method
 
   static String myMap = '$baseUrl/deliveries/my-map'; // Get method
-  static String myMapTypePickup = '$baseUrl/deliveries/my-map?type=pickup'; // Get method
-  static String myMapTypeDelivery = '$baseUrl/deliveries/my-map?type=delivery'; // Get method
-
+  static String myMapTypePickup =
+      '$baseUrl/deliveries/my-map?type=pickup'; // Get method
+  static String myMapTypeDelivery =
+      '$baseUrl/deliveries/my-map?type=delivery'; // Get method
 
   // ── Socket ──────────────────────────────────────────────────
   static const String socketUrl = _mainDomain;
 
   // ── Notification URLs ─────────────────────────────────────────
-  static const String updateFcmToken = '$baseUrl/auth/fcm-token'; // Update FCM Token
-  static const String notification = '$baseUrl/notifications'; // Get Notifications
-  static const String notificationReadAll = '$baseUrl/notifications/read-all'; // Read all
+  static const String updateFcmToken =
+      '$baseUrl/notifications/fcm-token'; // Patch Method FCM Token
+  static const String notification =
+      '$baseUrl/notifications'; // Get Notifications
+  static String notificationUnreadCount(String s) =>
+      '$baseUrl/notifications/unread-count'; // Get unread count
+  static String notificationRead(String id) =>
+      '$baseUrl/notifications/$id/read'; // Patch as read
+  static const String notificationReadAll =
+      '$baseUrl/notifications/read-all'; // Patch method all
 
-  static String notificationDelete(String id) => '$baseUrl/notifications/$id'; // Delete notification
-  static String notificationRead(String id) => '$baseUrl/notifications/$id/read'; // Mark as read
-  static String notificationUnreadCount(String s) => '$baseUrl/notifications/unread-count'; // Get unread count
-
-
-
+  static String notificationDelete(String id) =>
+      '$baseUrl/notifications/$id'; // Delete notification
 }

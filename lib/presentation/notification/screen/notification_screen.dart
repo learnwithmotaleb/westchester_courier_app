@@ -26,11 +26,11 @@ class NotificationScreen extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1A1A1A), // Dark background for eye icon
+                  color: AppColors.primaryColor, // Dark background for eye icon
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Icon(Icons.visibility,
-                    color: AppColors.primaryColor, size: 18),
+                    color: AppColors.whiteColor, size: 18),
               ),
             ),
           ),
@@ -66,7 +66,7 @@ class NotificationScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               final notification = controller.notifications[index];
               return Dismissible(
-                key: Key(notification.id.toString()),
+                key: Key(notification.sId.toString()),
                 direction: DismissDirection.endToStart,
                 background: Container(
                   alignment: Alignment.centerRight,
@@ -78,10 +78,10 @@ class NotificationScreen extends StatelessWidget {
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 onDismissed: (direction) {
-                  controller.deleteNotification(notification.id.toString());
+                  controller.deleteNotification(notification.sId.toString());
                 },
                 child: GestureDetector(
-                  onTap: () => controller.markAsRead(notification.id.toString()),
+                  onTap: () => controller.markAsRead(notification.sId.toString()),
                   child: NotificationItem(notification: notification),
                 ),
               );
