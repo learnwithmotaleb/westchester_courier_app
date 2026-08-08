@@ -27,6 +27,7 @@ class NotificationController extends GetxController {
   }
 
   Future<void> fetchNotifications() async {
+    Get.log('🔥 [DEBUG] fetchNotifications() called! 🔥');
     isLoading.value = true;
     try {
       final response = await ApiClient().get(
