@@ -35,14 +35,14 @@ class HomePage extends StatelessWidget {
                 children: [
                   Image.asset(AppIcons.appLogo, width: Dimensions.w(110)),
                   const Spacer(),
-                  IconButton(
-                    icon: Icon(
-                      Icons.search_rounded,
-                      color: AppColors.primaryColor,
-                      size: Dimensions.rs(24),
-                    ),
-                    onPressed: () {},
-                  ),
+                  // IconButton(
+                  //   icon: Icon(
+                  //     Icons.search_rounded,
+                  //     color: AppColors.primaryColor,
+                  //     size: Dimensions.rs(24),
+                  //   ),
+                  //   onPressed: () {},
+                  // ),
                   Obx(() {
                     return Badge(
                       isLabelVisible: notifController.unreadCount.value > 0,
