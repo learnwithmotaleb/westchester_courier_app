@@ -7,11 +7,12 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 import '../../../service/api_service.dart';
 import '../../../service/api_url.dart';
+import '../../../service/google_map_services.dart';
 import '../../../utils/app_colors/app_colors.dart';
 import '../../../utils/app_const/app_const.dart';
 import '../model/my_map_model.dart';
 
-enum MapFilter { pickup, delivery }
+enum MapFilter { all, pickup, delivery }
 
 class MyMapController extends GetxController {
   static MyMapController get to => Get.find<MyMapController>();
@@ -22,7 +23,7 @@ class MyMapController extends GetxController {
   final RxBool isLoading = false.obs;
   final RxBool hasError = false.obs;
   final RxString errorMessage = ''.obs;
-  final Rx<MapFilter> activeFilter = MapFilter.pickup.obs;
+  final Rx<MapFilter> activeFilter = MapFilter.all.obs;
 
   // Data
   final RxList<MapPoint> currentPoints = <MapPoint>[].obs;
@@ -35,7 +36,7 @@ class MyMapController extends GetxController {
 
   final Rx<CameraPosition> cameraPosition = const CameraPosition(
     target: LatLng(41.033986, -73.762910),
-    zoom: 11.0,
+    zoom: 14.56,
   ).obs;
 
   // Distance & duration
@@ -48,8 +49,41 @@ class MyMapController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    _initCameraFromCurrentLocation();
     loadMyMap();
   }
+
+  /// Set the initial camera position to the user's real GPS location
+  void _initCameraFromCurrentLocation() {
+    if (!Get.isRegistered<GoogleMapServices>()) return;
+    final gms = Get.find<GoogleMapServices>();
+    // If GPS is already ready, update the initial camera position
+    if (gms.isLocationReady.value) {
+      cameraPosition.value = CameraPosition(
+        target: LatLng(gms.currentLat.value, gms.currentLng.value),
+        zoom: 14.56,
+      );
+    }
+    // Whether ready or not, always animate once map is created (handled in onMapCreated)
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  CAMERA CONTROLS
+  // ─────────────────────────────────────────────────────────────
+
+  /// Animate camera to the user's current GPS position
+  void goToMyLocation() {
+    if (!Get.isRegistered<GoogleMapServices>()) return;
+    final gms = Get.find<GoogleMapServices>();
+    final pos = LatLng(gms.currentLat.value, gms.currentLng.value);
+    mapController?.animateCamera(
+      CameraUpdate.newCameraPosition(CameraPosition(target: pos, zoom: 14.56)),
+    );
+  }
+
+  void zoomIn() => mapController?.animateCamera(CameraUpdate.zoomIn());
+
+  void zoomOut() => mapController?.animateCamera(CameraUpdate.zoomOut());
 
   // ─────────────────────────────────────────────────────────────
   //  API
@@ -74,8 +108,17 @@ class MyMapController extends GetxController {
         // Use the filtered points list based on what was returned
         if (activeFilter.value == MapFilter.pickup) {
           currentPoints.assignAll(model.pickupPoints ?? model.points ?? []);
-        } else {
+        } else if (activeFilter.value == MapFilter.delivery) {
           currentPoints.assignAll(model.deliveryPoints ?? model.points ?? []);
+        } else {
+          // If 'all', combine pickup and delivery, or fallback to general points
+          final allPoints = <MapPoint>[];
+          if (model.pickupPoints != null) allPoints.addAll(model.pickupPoints!);
+          if (model.deliveryPoints != null) allPoints.addAll(model.deliveryPoints!);
+          if (allPoints.isEmpty && model.points != null) {
+            allPoints.addAll(model.points!);
+          }
+          currentPoints.assignAll(allPoints);
         }
 
         _buildMarkers();
@@ -94,6 +137,8 @@ class MyMapController extends GetxController {
 
   String _urlForFilter(MapFilter filter) {
     switch (filter) {
+      case MapFilter.all:
+        return ApiUrl.myMap;
       case MapFilter.pickup:
         return ApiUrl.myMapTypePickup;
       case MapFilter.delivery:
@@ -118,6 +163,27 @@ class MyMapController extends GetxController {
   void _buildMarkers() {
     final newMarkers = <Marker>{};
 
+    // 1. Add driver location marker (if available)
+    if (Get.isRegistered<GoogleMapServices>()) {
+      final gms = Get.find<GoogleMapServices>();
+      if (gms.isLocationReady.value) {
+        newMarkers.add(
+          Marker(
+            markerId: const MarkerId('driver_current_location'),
+            position: LatLng(gms.currentLat.value, gms.currentLng.value),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+            infoWindow: const InfoWindow(
+              title: 'My Location',
+              snippet: 'Driver',
+            ),
+            zIndex: 99, // keep it on top
+          ),
+        );
+      }
+    }
+
+    // 2. Add pickup/delivery points
+
     for (final point in currentPoints) {
       if (point.lat != null && point.lng != null) {
         final isPickup = point.isPickup;
@@ -139,11 +205,6 @@ class MyMapController extends GetxController {
     }
 
     markers.assignAll(newMarkers);
-
-    // Fit bounds to show all markers
-    if (currentPoints.isNotEmpty && mapController != null) {
-      Future.delayed(const Duration(milliseconds: 300), _fitAllMarkersBounds);
-    }
   }
 
   void _fitAllMarkersBounds() {
@@ -179,9 +240,11 @@ class MyMapController extends GetxController {
 
   void onMapCreated(GoogleMapController controller) {
     mapController = controller;
-    if (currentPoints.isNotEmpty) {
-      Future.delayed(const Duration(milliseconds: 300), _fitAllMarkersBounds);
-    }
+    
+    // Always move directly to the user's current GPS location first
+    Future.delayed(const Duration(milliseconds: 200), () {
+      goToMyLocation();
+    });
   }
 
   // ─────────────────────────────────────────────────────────────

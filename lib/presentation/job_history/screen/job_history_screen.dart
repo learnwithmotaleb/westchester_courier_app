@@ -81,7 +81,8 @@ class JobHistoryScreen extends GetView<JobHistoryController> {
                       child: AppEmptyState(
                         icon: Icons.history_rounded,
                         title: 'No History Found',
-                        subtitle: 'Your job history will appear here once you complete deliveries.',
+                        subtitle:
+                            'Your job history will appear here once you complete deliveries.',
                       ),
                     );
                   }
@@ -93,13 +94,16 @@ class JobHistoryScreen extends GetView<JobHistoryController> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           _buildDateHeader(group.date ?? ''),
-                          ...((group.jobs ?? []).map((job) => JobHistoryCard(
-                                jobId: job.orderNumber ?? '-',
-                                assignDate: _formatDate(job.assignDate),
-                                status: _formatStatus(job.status),
-                                fromAddress: job.pickupAddress ?? '-',
-                                toAddress: job.dropoffAddress ?? '-',
-                              ))),
+                          ...((group.jobs ?? []).map(
+                            (job) => JobHistoryCard(
+                              deliveryId: job.sId,
+                              jobId: job.orderNumber ?? '-',
+                              assignDate: _formatDate(job.assignDate),
+                              status: _formatStatus(job.status),
+                              fromAddress: job.pickupAddress ?? '-',
+                              toAddress: job.dropoffAddress ?? '-',
+                            ),
+                          )),
                           SizedBox(height: Dimensions.h(8)),
                         ],
                       );
@@ -133,8 +137,18 @@ class JobHistoryScreen extends GetView<JobHistoryController> {
     try {
       final dt = DateTime.parse(isoDate).toLocal();
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
       return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
     } catch (_) {

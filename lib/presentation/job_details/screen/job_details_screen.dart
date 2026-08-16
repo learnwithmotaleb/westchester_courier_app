@@ -266,6 +266,21 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                 child: Obx(() {
                   final step = controller.rxStep.value;
 
+                  // ── Terminal states: Cancelled or Rejected ──────────────
+                  if (step == -1) {
+                    return _TerminalStatusBanner(
+                      message: 'This job has been cancelled by Admin',
+                      icon: Icons.info_outline_rounded,
+                    );
+                  }
+
+                  if (step == -2) {
+                    return _TerminalStatusBanner(
+                      message: 'This job has been rejected by You',
+                      icon: Icons.info_outline_rounded,
+                    );
+                  }
+
                   if (step == 0) {
                     return Column(
                       children: [
@@ -273,18 +288,20 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                           children: [
                             Expanded(
                               child: GestureDetector(
-                                onTap: controller.actionLoading.value ? null : () {
-                                  AppAlerts.actionConfirm(
-                                    title: 'Confirmation',
-                                    message:
-                                        'Are you sure you want to reject the Delivery Request?',
-                                    confirmLabel: 'Reject',
-                                    onConfirm: () {
-                                      Get.back();
-                                      controller.rejectRequest();
-                                    },
-                                  );
-                                },
+                                onTap: controller.actionLoading.value
+                                    ? null
+                                    : () {
+                                        AppAlerts.actionConfirm(
+                                          title: 'Confirmation',
+                                          message:
+                                              'Are you sure you want to reject the Delivery Request?',
+                                          confirmLabel: 'Reject',
+                                          onConfirm: () {
+                                            Get.back();
+                                            controller.rejectRequest();
+                                          },
+                                        );
+                                      },
                                 child: Container(
                                   height: Dimensions.h(48),
                                   decoration: BoxDecoration(
@@ -302,17 +319,19 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                                       ? SizedBox(
                                           width: Dimensions.w(24),
                                           height: Dimensions.w(24),
-                                          child: const CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppColors.redColor,
-                                          ),
+                                          child:
+                                              const CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: AppColors.redColor,
+                                              ),
                                         )
                                       : Text(
                                           'Reject Request',
-                                          style: AppTextStyles.buttonSmall.copyWith(
-                                            color: AppColors.redColor,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                          style: AppTextStyles.buttonSmall
+                                              .copyWith(
+                                                color: AppColors.redColor,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                 ),
                               ),
@@ -390,7 +409,8 @@ class JobDetailsScreen extends GetView<JobDetailsController> {
                           onPressed: () => Get.toNamed(
                             RoutePath.deliveryProof,
                             arguments: {
-                              'deliveryId': controller.deliveryData.value?.id ?? '',
+                              'deliveryId':
+                                  controller.deliveryData.value?.id ?? '',
                             },
                           ),
                           backgroundColor: AppColors.primaryColor,
@@ -456,6 +476,39 @@ class _ReportIssueButton extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _TerminalStatusBanner extends StatelessWidget {
+  final String message;
+  final IconData icon;
+
+  const _TerminalStatusBanner({required this.message, required this.icon});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: Dimensions.h(52),
+      decoration: BoxDecoration(
+        color: const Color(0xFF6B7280),
+        borderRadius: BorderRadius.circular(Dimensions.r(30)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: AppColors.whiteColor, size: Dimensions.rs(18)),
+          SizedBox(width: Dimensions.w(8)),
+          Text(
+            message,
+            style: AppTextStyles.bodyText.copyWith(
+              color: AppColors.whiteColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }

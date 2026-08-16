@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:mime/mime.dart';
 import 'package:flutter/foundation.dart';
+import '../core/routes/route_path.dart';
 import '../helper/local_db/local_db.dart';
 import '../helper/no_internet/controller/no_internet_controller.dart';
 
@@ -19,7 +20,12 @@ class CustomLogger {
       debugPrint(full);
     } else {
       for (int i = 0; i < full.length; i += chunkSize) {
-        debugPrint(full.substring(i, i + chunkSize > full.length ? full.length : i + chunkSize));
+        debugPrint(
+          full.substring(
+            i,
+            i + chunkSize > full.length ? full.length : i + chunkSize,
+          ),
+        );
       }
     }
   }
@@ -35,7 +41,9 @@ typedef ApiResult = Response;
 
 class ApiClient {
   static const defaultTimeout = Duration(seconds: 30);
-  static const multipartTimeout = Duration(seconds: 120); // longer for file uploads
+  static const multipartTimeout = Duration(
+    seconds: 120,
+  ); // longer for file uploads
 
   Future<Map<String, String>> _headers({
     bool isBasic = false,
@@ -125,6 +133,20 @@ class ApiClient {
 
   /// ---------------- Response Handler ---------------------------
   ApiResult _handleResponse(http.Response response) {
+    if (response.statusCode == 401) {
+      log.e("401 Unauthorized - Token Expired! Redirecting to login...");
+      SharePrefsHelper.clearUserSession().then((_) {
+        if (Get.currentRoute != RoutePath.login) {
+          Get.offAllNamed(RoutePath.login);
+          Get.snackbar(
+            'Session Expired',
+            'Please login again to continue.',
+            snackPosition: SnackPosition.TOP,
+          );
+        }
+      });
+    }
+
     final String requestUrl = response.request?.url.toString() ?? 'Unknown URL';
     final String requestMethod = response.request?.method ?? 'Unknown Method';
 
@@ -373,8 +395,9 @@ class ApiClient {
       final streamed = await request.send().timeout(ApiClient.multipartTimeout);
 
       // Convert streamed response to http.Response (also with timeout)
-      final response = await http.Response.fromStream(streamed)
-          .timeout(ApiClient.multipartTimeout);
+      final response = await http.Response.fromStream(
+        streamed,
+      ).timeout(ApiClient.multipartTimeout);
 
       log.i("Multipart Response Status: ${response.statusCode}");
       log.i("Multipart Response Body: ${response.body}");

@@ -199,6 +199,10 @@ class JobDetailsController extends GetxController {
         return 4; // step 4: Complete Delivery
       case 'DELIVERED':
         return 5; // step 5: Done
+      case 'CANCELLED':
+        return -1; // step -1: Cancelled by Admin
+      case 'REJECTED':
+        return -2; // step -2: Rejected by Driver
       default:
         return 0;
     }
