@@ -52,21 +52,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBroao3z8390-5XdCSuxPImWM4zLvKlguY',
-    appId: '1:853567226580:android:cfa88da42acfdc7158b141',
+    appId: '1:853567226580:android:059459a7557c978158b141',
     messagingSenderId: '853567226580',
     projectId: 'courier-app-a8786',
     storageBucket: 'courier-app-a8786.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDB1kDirBngI4NBbtTgL0AqjOFPbEDIpQc',
-    appId: '1:853567226580:ios:9295f0def9cce66058b141',
+    appId: '1:853567226580:ios:bc666c4bc11c675458b141',
     messagingSenderId: '853567226580',
     projectId: 'courier-app-a8786',
     storageBucket: 'courier-app-a8786.firebasestorage.app',
-    iosBundleId: 'com.lwm.westchester',
+    iosBundleId: 'com.westchestercourierservices.app',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDB1kDirBngI4NBbtTgL0AqjOFPbEDIpQc',
     appId: '1:853567226580:ios:9295f0def9cce66058b141',
