@@ -14,7 +14,7 @@ class ApiUrl {
   //     "https://nc5cnwcx-8001.inc1.devtunnels.ms"; //live
   //
   static const String _mainDomain =
-      "https://nc5cnwcx-8001.inc1.devtunnels.ms"; //live
+      "https://api.westchestercourierservices.com"; //live
 
   static const String baseUrl = _mainDomain;
 
