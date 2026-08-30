@@ -357,6 +357,10 @@ class ApiClient {
         isToken: isToken,
         customHeaders: customHeaders,
       );
+      // MultipartRequest must generate its own Content-Type header including
+      // the boundary. A JSON Content-Type prevents backends from parsing
+      // form fields and uploaded files correctly.
+      headers.removeWhere((key, _) => key.toLowerCase() == 'content-type');
       request.headers.addAll(headers);
       log.i("Request Headers: $headers");
 
@@ -369,8 +373,7 @@ class ApiClient {
         final fileObj = File(file.path);
 
         if (!fileObj.existsSync()) {
-          log.e("File not found: ${file.path}");
-          continue; // skip missing files
+          throw FileSystemException('Upload file not found', file.path);
         }
 
         final mimeTypeData =

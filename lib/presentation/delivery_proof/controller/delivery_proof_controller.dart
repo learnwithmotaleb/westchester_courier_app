@@ -97,6 +97,15 @@ class DeliveryProofController extends GetxController {
       return;
     }
 
+    if (!File(rxImagePath.value).existsSync() ||
+        !File(rxSignaturePath.value).existsSync()) {
+      AppSnackBar.fail(
+        'A selected image is no longer available. Please select it again.',
+        title: 'Upload failed',
+      );
+      return;
+    }
+
     if (deliveryId.isEmpty) {
       AppSnackBar.fail('Delivery ID not found. Please go back and try again.');
       return;
@@ -126,21 +135,29 @@ class DeliveryProofController extends GetxController {
         isToken: true,
       );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final statusCode = response.statusCode ?? 0;
+      final body = response.body;
+      final apiSuccess = body is! Map || body['success'] != false;
+      if (statusCode >= 200 && statusCode < 300 && apiSuccess) {
         AppSnackBar.success(
-          response.body['message'] ?? 'Delivery completed successfully!',
+          body is Map
+              ? (body['message'] ?? 'Delivery completed successfully!')
+                    .toString()
+              : 'Delivery completed successfully!',
         );
         // Update job details step to "Done"
         if (Get.isRegistered<JobDetailsController>()) {
-          Get.find<JobDetailsController>().markAsDone();
+          await Get.find<JobDetailsController>().markAsDone();
         }
 
         // Go back to job details
         Get.back();
       } else {
-        final msg = response.body is Map
-            ? (response.body['message'] ?? 'Failed to submit proof.')
-            : 'Failed to submit proof. Please try again.';
+        final msg = body is Map
+            ? (body['message'] ??
+                  body['error'] ??
+                  'Failed to submit proof (HTTP $statusCode).')
+            : 'Failed to submit proof (HTTP $statusCode).';
         AppSnackBar.fail(msg.toString());
       }
     } catch (e) {
