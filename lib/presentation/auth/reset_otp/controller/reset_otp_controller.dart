@@ -20,38 +20,35 @@ class ResetOtpController extends GetxController {
   Future<void> verifyResetOtp() async {
     final otpText = otpController.text.trim();
 
+    if (_email.isEmpty) {
+      AppSnackBar.fail('Email not found. Please request a new reset code.');
+      return;
+    }
+
     if (otpText.length != 6) {
       AppSnackBar.fail('Please enter a 6-digit code');
       return;
     }
 
     isLoading.value = true;
-
     try {
       final response = await _apiClient.post(
         url: ApiUrl.verifyOtp,
-        body: {
-          'email': _email,
-          'code': otpText,
-        },
+        body: {'email': _email, 'code': otpText},
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         AppSnackBar.success(
           response.body?['message'] ?? 'Code verified! Set your new password.',
         );
-        // Navigate to Reset Password screen, passing email
-        Get.toNamed(
-          RoutePath.resetPassword,
-          arguments: {'email': _email},
-        );
+        Get.toNamed(RoutePath.resetPassword, arguments: {'email': _email});
       } else {
         final message = response.body?['message'] ??
             response.body?['error'] ??
             'Invalid code. Please try again.';
         AppSnackBar.fail(message.toString());
       }
-    } catch (e) {
+    } catch (_) {
       AppSnackBar.fail('Something went wrong. Please try again.');
     } finally {
       isLoading.value = false;

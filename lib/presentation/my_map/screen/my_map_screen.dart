@@ -80,7 +80,7 @@ class _MyMapScreenState extends State<MyMapScreen> {
               child: Stack(
                 children: [
                   // ── Google Map ────────────────────────────────
-                  GoogleMap(
+                  Obx(() => GoogleMap(
                     onMapCreated: controller.onMapCreated,
                     initialCameraPosition: controller.cameraPosition.value,
                     markers: controller.markers.toSet(),
@@ -102,7 +102,7 @@ class _MyMapScreenState extends State<MyMapScreen> {
                     buildingsEnabled: true,
                     indoorViewEnabled: true,
                     onTap: (_) => controller.clearSelection(),
-                  ),
+                  )),
 
                   // ── Zoom + My Location FAB (Right Side) ──────
                   Positioned(

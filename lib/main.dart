@@ -28,7 +28,6 @@ void main() async {
   }
 
   // ── Request location permission (geolocator built-in dialog) ──
-  await _requestLocationPermission();
 
   // ── Register permanent services ───────────────────────────────
   Get.put(InternetController(), permanent: true);
@@ -37,22 +36,52 @@ void main() async {
 
   // GoogleMapServices auto-fetches real GPS in onInit()
   // Location permission is already granted above before this runs
-  Get.put(GoogleMapServices(), permanent: true);
-
   runApp(MyApp());
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _initializeLocationServices();
+  });
 }
 
 /// Requests location permission using geolocator's native dialog.
 /// Notification permission is handled internally by the notification package.
-Future<void> _requestLocationPermission() async {
+Future<void> _initializeLocationServices() async {
+  if (!PlatformHelper.isMobile) {
+    Get.put(GoogleMapServices(), permanent: true);
+    return;
+  }
+
   LocationPermission permission = await Geolocator.checkPermission();
 
   if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
+    final shouldContinue = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Location access for deliveries'),
+        content: const Text(
+          'Westchester Courier collects location data to track delivery '
+          'progress and provide route and dispatch functionality, even when '
+          'the app is closed or not in use. Location is sent securely to '
+          'Westchester Courier while you are completing deliveries. Tap '
+          'Continue to choose your permission in the next system dialog.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: false),
+            child: const Text('Not now'),
+          ),
+          FilledButton(
+            onPressed: () => Get.back(result: true),
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+    if (shouldContinue == true) {
+      permission = await Geolocator.requestPermission();
+    }
   }
 
-  if (permission == LocationPermission.deniedForever) {
-    // Opens device App Settings so user can enable manually
-    await Geolocator.openAppSettings();
+  if (!Get.isRegistered<GoogleMapServices>()) {
+    Get.put(GoogleMapServices(), permanent: true);
   }
 }

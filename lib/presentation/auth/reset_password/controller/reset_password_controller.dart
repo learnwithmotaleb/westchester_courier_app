@@ -19,8 +19,13 @@ class ResetPasswordController extends GetxController {
   String get _email =>
       (Get.arguments as Map<String, dynamic>?)?['email']?.toString() ?? '';
 
-  void resetPassword() async {
+  Future<void> resetPassword() async {
     if (!(formKey.currentState?.validate() ?? false)) return;
+
+    if (_email.isEmpty) {
+      AppSnackBar.fail('Email not found. Please restart password recovery.');
+      return;
+    }
 
     isLoading.value = true;
 
@@ -39,8 +44,12 @@ class ResetPasswordController extends GetxController {
           response.body?['message'] ??
               'Password reset successful! Please sign in.',
         );
-        // Go back to login
-        Get.offAllNamed(RoutePath.login);
+
+        // This flow starts from Login -> Forgot -> OTP -> Reset. Returning to
+        // the existing Login route avoids deleting and recreating its text
+        // controllers while the route transition is still rendering.
+        FocusManager.instance.primaryFocus?.unfocus();
+        Get.until((route) => route.settings.name == RoutePath.login);
       } else {
         final message =
             response.body?['message'] ??

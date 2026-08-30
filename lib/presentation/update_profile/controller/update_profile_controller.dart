@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -132,13 +133,35 @@ class UpdateProfileController extends GetxController {
 
   // ── Image picker ──────────────────────────────────────────────
   Future<void> pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-    );
-    if (image != null) {
-      selectedImage.value = File(image.path);
+    try {
+      final XFile? image = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        requestFullMetadata: false,
+      );
+
+      if (image == null) return;
+
+      final file = File(image.path);
+      if (!await file.exists() || await file.length() == 0) {
+        AppSnackBar.fail('The selected photo could not be read.');
+        return;
+      }
+
+      selectedImage.value = file;
+    } on PlatformException catch (e) {
+      if (e.code == 'photo_access_denied' ||
+          e.code == 'camera_access_denied') {
+        AppSnackBar.fail(
+          'Photo access is disabled. Enable it from iPhone Settings.',
+        );
+      } else {
+        AppSnackBar.fail('Unable to select photo. Please try again.');
+      }
+    } catch (_) {
+      AppSnackBar.fail('Unable to select photo. Please try again.');
     }
   }
 

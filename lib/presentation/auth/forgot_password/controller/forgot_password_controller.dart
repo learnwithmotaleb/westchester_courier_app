@@ -11,7 +11,7 @@ class ForgotPasswordController extends GetxController {
 
   final ApiClient _apiClient = ApiClient();
 
-  void sendForgotPasswordEmail() async {
+  Future<void> sendForgotPasswordEmail() async {
     final email = emailController.text.trim();
 
     if (email.isEmpty) {

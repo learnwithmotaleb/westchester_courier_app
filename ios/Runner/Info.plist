@@ -26,7 +26,7 @@
 
 	<!-- Google Maps API Key -->
 	<key>GMSApiKey</key>
-	<string>AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-Ubol</string>
+	<string>AIzaSyCY_oVLft-gyfzV_6msJ_H790rH6B-UboI</string>
 
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
@@ -80,19 +80,18 @@
 
 	<!-- Location Permission -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Westchester Courier requires access to your location to provide navigation, route guidance, and delivery services.</string>
+	<string>Westchester Courier accesses your location to provide navigation, dispatch, and delivery progress tracking.</string>
 
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Westchester Courier requires background location access for real-time courier tracking and delivery management.</string>
+	<string>Westchester Courier accesses your location to track active delivery progress and support dispatch, even when the app is closed or not in use.</string>
 
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Westchester Courier requires background location access for real-time courier tracking and delivery management.</string>
+	<string>Westchester Courier accesses your location to track active delivery progress and support dispatch, even when the app is closed or not in use.</string>
 
 	<!-- Background Location and Notifications -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
-		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
 

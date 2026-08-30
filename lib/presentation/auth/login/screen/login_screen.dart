@@ -76,6 +76,22 @@ class LoginScreen extends GetView<LoginController> {
 
               SizedBox(height: Dimensions.h(24)),
 
+              // Forgot Password Link
+              GestureDetector(
+                onTap: () => Get.toNamed(RoutePath.forgotPassword),
+                child: Text(
+                  'Forgot Password',
+                  style: AppTextStyles.bodyText.copyWith(
+                    color: AppColors.darkGreyColor,
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline,
+                    decorationColor: AppColors.darkGreyColor,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: Dimensions.h(16)),
+
               // Sign Up Link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

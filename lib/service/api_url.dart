@@ -63,9 +63,9 @@ class ApiUrl {
   static const String verifyOtp = '$baseUrl/auth/verify-otp';
   static const String resetPassword = '$baseUrl/auth/reset-password';
   static const String forgotPassword = '$baseUrl/auth/forgot-password';
-  static const String verifyResetOtp = '$baseUrl/auth/verify-reset-otp';
   static const String changePassword =
       '$baseUrl/auth/change-password'; //Patch method
+  static const String deleteAccount = '$baseUrl/profile/me'; //Delete method
   static const String termsCondition = '$baseUrl/terms-conditions'; //get method
   static const String privacyAndPolicy = '$baseUrl/privacy-policy'; //get method
 

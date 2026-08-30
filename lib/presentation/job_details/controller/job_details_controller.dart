@@ -148,8 +148,9 @@ class JobDetailsController extends GetxController {
           deliveryData.value = model.data;
           rxStep.value = _getStepFromStatus(model.data!.status);
 
-          if (Get.isRegistered<GoogleMapServices>()) {
-            Get.find<GoogleMapServices>().activeDeliveryId.value = id;
+          if (_isActiveDeliveryStatus(model.data!.status) &&
+              Get.isRegistered<GoogleMapServices>()) {
+            await Get.find<GoogleMapServices>().startDeliveryTracking(id);
           }
 
           final pCoords = model.data!.pickupCoordinates?.coordinates;
@@ -207,6 +208,14 @@ class JobDetailsController extends GetxController {
         return 0;
     }
   }
+
+  bool _isActiveDeliveryStatus(String? status) => const {
+        'DRIVER_ACCEPTED',
+        'DRIVER_TO_PICKUP',
+        'PICKED_UP',
+        'IN_TRANSIT',
+        'OUT_FOR_DELIVERY',
+      }.contains(status);
 
   // ─── Map Callbacks ──────────────────────────────────────────────────────────
   void onMapCreated(GoogleMapController controller) {
@@ -375,9 +384,8 @@ class JobDetailsController extends GetxController {
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.body?['success'] == true) {
           rxStep.value = nextStep;
-          // Show success but we can also use AppSnackBar if it exists
           if (Get.isRegistered<GoogleMapServices>()) {
-            // Maybe refresh map/location stuff if needed
+            await Get.find<GoogleMapServices>().startDeliveryTracking(id);
           }
         }
       } else {
@@ -446,6 +454,9 @@ class JobDetailsController extends GetxController {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (response.body?['success'] == true) {
+          if (Get.isRegistered<GoogleMapServices>()) {
+            await Get.find<GoogleMapServices>().stopDeliveryTracking();
+          }
           Get.back();
         }
       } else {
@@ -461,10 +472,10 @@ class JobDetailsController extends GetxController {
     }
   }
 
-  void markAsDone() {
+  Future<void> markAsDone() async {
     rxStep.value = 5;
     if (Get.isRegistered<GoogleMapServices>()) {
-      Get.find<GoogleMapServices>().activeDeliveryId.value = '';
+      await Get.find<GoogleMapServices>().stopDeliveryTracking();
     }
   }
 }

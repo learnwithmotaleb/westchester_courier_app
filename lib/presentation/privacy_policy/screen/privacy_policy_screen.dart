@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:get/get.dart';
 import 'package:westchester/utils/app_colors/app_colors.dart';
 import 'package:westchester/utils/app_text_style/app_text_style.dart';
@@ -14,7 +15,7 @@ class PrivacyPolicyScreen extends GetView<PrivacyPolicyController> {
     return Scaffold(
       backgroundColor: AppColors.whiteColor,
       appBar: CommonAppBar(
-        title: '',
+        title: 'Privacy Policy',
         showBack: true,
         backgroundColor: AppColors.whiteColor,
         onBack: () => Get.back(),
@@ -43,12 +44,17 @@ class PrivacyPolicyScreen extends GetView<PrivacyPolicyController> {
                   }
 
                   return SingleChildScrollView(
-                    child: Text(
-                      controller.description.value,
-                      style: AppTextStyles.bodyText.copyWith(
-                        color: AppColors.textPrimaryColor,
-                        height: 1.5,
-                      ),
+                    child: Html(
+                      data: controller.description.value,
+                      style: {
+                        'body': Style(
+                          margin: Margins.zero,
+                          padding: HtmlPaddings.zero,
+                          color: AppColors.textPrimaryColor,
+                          fontSize: FontSize(Dimensions.fs(14)),
+                          lineHeight: const LineHeight(1.5),
+                        ),
+                      },
                     ),
                   );
                 }),
