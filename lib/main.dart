@@ -53,32 +53,30 @@ Future<void> _initializeLocationServices() async {
   LocationPermission permission = await Geolocator.checkPermission();
 
   if (permission == LocationPermission.denied) {
-    final shouldContinue = await Get.dialog<bool>(
-      AlertDialog(
-        title: const Text('Location access for deliveries'),
-        content: const Text(
-          'Westchester Courier collects location data to track delivery '
-          'progress and provide route and dispatch functionality, even when '
-          'the app is closed or not in use. Location is sent securely to '
-          'Westchester Courier while you are completing deliveries. Tap '
-          'Continue to choose your permission in the next system dialog.',
+    // The custom explanation must always lead straight into the native
+    // permission dialog — no "Not now"/dismiss path (Apple 5.1.1(iv)).
+    await Get.dialog<void>(
+      PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: const Text('Location access for deliveries'),
+          content: const Text(
+            'Westchester Courier collects location data to track delivery '
+            'progress and provide route and dispatch functionality, even when '
+            'the app is closed or not in use. Location is sent securely to '
+            'Westchester Courier while you are completing deliveries.',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Get.back(),
+              child: const Text('Continue'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(result: false),
-            child: const Text('Not now'),
-          ),
-          FilledButton(
-            onPressed: () => Get.back(result: true),
-            child: const Text('Continue'),
-          ),
-        ],
       ),
       barrierDismissible: false,
     );
-    if (shouldContinue == true) {
-      permission = await Geolocator.requestPermission();
-    }
+    permission = await Geolocator.requestPermission();
   }
 
   if (!Get.isRegistered<GoogleMapServices>()) {
