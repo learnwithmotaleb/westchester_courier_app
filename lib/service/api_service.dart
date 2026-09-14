@@ -178,7 +178,14 @@ class ApiClient {
   /// ---------------- Error Handler -------------------------------
   ApiResult _handleException(String message) {
     log.e("====== API Error ======\n$message");
-    return Response(statusCode: 400, body: {}, statusText: message);
+    // Carry the real Dart-level failure (timeout, file missing, socket, etc.)
+    // in the body so callers can surface it instead of a generic "HTTP 400"
+    // message that hides what actually went wrong client-side.
+    return Response(
+      statusCode: 400,
+      body: {'message': message},
+      statusText: message,
+    );
   }
 
   /// ---------------- Logging -------------------------------------
